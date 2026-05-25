@@ -21,47 +21,53 @@ Comportamento:
 - Cite normas técnicas relevantes (ISO, NBR, NR, etc.)
 - Ofereça exemplos práticos e procedimentos passo a passo quando necessário
 - Quando receber uma imagem ou foto, analise-a detalhadamente: identifique componentes, sintomas visíveis, desgastes, vazamentos, conexões incorretas, códigos de erro, esquemas elétricos/hidráulicos etc.
-- Quando receber um PDF, leia e interprete o documento: manuais, esquemas, datasheets, relatórios de manutenção etc.
 - Faça perguntas de diagnóstico para entender melhor o problema antes de dar uma resposta definitiva
 - Analise de forma integrada quando o problema envolve múltiplas áreas
 - Priorize segurança: sempre alerte sobre riscos antes de procedimentos
 - Sugira ferramentas e equipamentos necessários para as intervenções
 - Responda sempre em português do Brasil"""
 
-MODEL = "gemini-2.0-flash"
+TEXT_MODEL = "llama-3.3-70b-versatile"
+VISION_MODEL = "llama-3.2-11b-vision-preview"
+GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 WELCOME_MESSAGE = (
     "Olá! Sou especialista sênior em manutenção industrial com mais de 20 anos de experiência. "
     "Atuo em hidráulica, elétrica, eletrônica, mecânica, automação e muito mais.\n\n"
     "Você pode:\n"
     "- Digitar sua dúvida técnica\n"
-    "- Anexar uma **foto** do equipamento, componente ou problema\n"
-    "- Anexar um **PDF** (manual, esquema, datasheet)\n\n"
+    "- Anexar uma **foto** do equipamento, componente ou problema\n\n"
     "Como posso ajudá-lo hoje?"
 )
 
 
-def stream_gemini(contents, api_key):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:streamGenerateContent"
-    params = {"key": api_key, "alt": "sse"}
-    body = {
-        "system_instruction": {"parts": [{"text": SYSTEM_PROMPT}]},
-        "contents": contents,
-        "generationConfig": {"temperature": 0.7},
+def stream_groq(api_messages, api_key, model):
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
     }
-    with requests.post(url, params=params, json=body, stream=True, timeout=120) as resp:
+    body = {
+        "model": model,
+        "messages": api_messages,
+        "stream": True,
+        "temperature": 0.7,
+        "max_tokens": 4096,
+    }
+    with requests.post(GROQ_URL, headers=headers, json=body, stream=True, timeout=120) as resp:
         resp.raise_for_status()
         for line in resp.iter_lines():
             if line:
                 decoded = line.decode("utf-8")
                 if decoded.startswith("data: "):
+                    data_str = decoded[6:].strip()
+                    if data_str == "[DONE]":
+                        break
                     try:
-                        data = json.loads(decoded[6:])
-                        for candidate in data.get("candidates", []):
-                            for part in candidate.get("content", {}).get("parts", []):
-                                if "text" in part:
-                                    yield part["text"]
-                    except json.JSONDecodeError:
+                        data = json.loads(data_str)
+                        content = data["choices"][0]["delta"].get("content", "")
+                        if content:
+                            yield content
+                    except (json.JSONDecodeError, KeyError, IndexError):
                         pass
 
 
@@ -74,9 +80,9 @@ st.set_page_config(
 st.title("⚙️ Técnico Especialista — Manutenção Industrial")
 st.caption("Hidráulica · Elétrica · Automação · Mecânica · Eletrônica")
 
-api_key = os.environ.get("GEMINI_API_KEY", "")
+api_key = os.environ.get("GROQ_API_KEY", "")
 if not api_key:
-    st.error("⚠️ Chave da API não encontrada. Configure a variável `GEMINI_API_KEY`.")
+    st.error("⚠️ Chave da API não encontrada. Configure a variável `GROQ_API_KEY`.")
     st.stop()
 
 if "messages" not in st.session_state:
@@ -89,17 +95,14 @@ for message in st.session_state.messages:
             st.image(PIL.Image.open(io.BytesIO(message["image_bytes"])), width=380)
 
 with st.sidebar:
-    st.header("📎 Anexar arquivo")
+    st.header("📎 Anexar imagem")
     uploaded_file = st.file_uploader(
-        "Foto ou PDF",
-        type=["jpg", "jpeg", "png", "webp", "pdf"],
-        help="Anexe uma foto do equipamento ou documento PDF",
+        "Foto do equipamento",
+        type=["jpg", "jpeg", "png", "webp"],
+        help="Anexe uma foto do equipamento ou problema",
     )
     if uploaded_file:
-        if uploaded_file.type.startswith("image/"):
-            st.image(uploaded_file, caption=uploaded_file.name, use_container_width=True)
-        else:
-            st.success(f"📄 {uploaded_file.name}")
+        st.image(uploaded_file, caption=uploaded_file.name, use_container_width=True)
         st.caption("Será enviado com sua próxima mensagem.")
 
     st.divider()
@@ -121,22 +124,14 @@ with st.sidebar:
         st.rerun()
 
 if prompt := st.chat_input("Descreva o problema ou faça sua pergunta técnica..."):
-    file_part = None
     image_bytes = None
+    mime_type = None
     display_suffix = ""
 
     if uploaded_file is not None:
-        raw_bytes = uploaded_file.read()
+        image_bytes = uploaded_file.read()
         mime_type = uploaded_file.type
-        b64 = base64.b64encode(raw_bytes).decode("utf-8")
-
-        if mime_type.startswith("image/"):
-            image_bytes = raw_bytes
-            file_part = {"inline_data": {"mime_type": mime_type, "data": b64}}
-            display_suffix = f"\n\n📷 *[Imagem: {uploaded_file.name}]*"
-        elif mime_type == "application/pdf":
-            file_part = {"inline_data": {"mime_type": "application/pdf", "data": b64}}
-            display_suffix = f"\n\n📄 *[PDF: {uploaded_file.name}]*"
+        display_suffix = f"\n\n📷 *[Imagem: {uploaded_file.name}]*"
 
     display_text = prompt + display_suffix
     user_msg = {"role": "user", "content": display_text}
@@ -149,32 +144,37 @@ if prompt := st.chat_input("Descreva o problema ou faça sua pergunta técnica..
         if image_bytes:
             st.image(PIL.Image.open(io.BytesIO(image_bytes)), width=380)
 
-    # Monta histórico para a API REST
-    contents = []
-    messages_for_api = st.session_state.messages[:-1]
-    start = next(
-        (i for i, m in enumerate(messages_for_api) if m["role"] == "user"),
-        len(messages_for_api),
-    )
-    for m in messages_for_api[start:]:
-        role = "user" if m["role"] == "user" else "model"
-        contents.append({"role": role, "parts": [{"text": m["content"]}]})
+    # Monta histórico no formato OpenAI
+    api_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
+    for m in st.session_state.messages[:-1]:
+        if m["role"] in ("user", "assistant"):
+            api_messages.append({"role": m["role"], "content": m["content"]})
 
-    current_parts = [{"text": prompt}]
-    if file_part:
-        current_parts.append(file_part)
-    contents.append({"role": "user", "parts": current_parts})
+    # Mensagem atual com ou sem imagem
+    if image_bytes:
+        b64 = base64.b64encode(image_bytes).decode("utf-8")
+        api_messages.append({
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt},
+                {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{b64}"}},
+            ],
+        })
+        model = VISION_MODEL
+    else:
+        api_messages.append({"role": "user", "content": prompt})
+        model = TEXT_MODEL
 
     with st.chat_message("assistant"):
         placeholder = st.empty()
         full_response = ""
         try:
-            for chunk in stream_gemini(contents, api_key):
+            for chunk in stream_groq(api_messages, api_key, model):
                 full_response += chunk
                 placeholder.markdown(full_response + "▌")
             placeholder.markdown(full_response)
         except requests.HTTPError as e:
-            placeholder.error(f"Erro na API: {e.response.status_code} — {e.response.text}")
+            placeholder.error(f"Erro na API: {e.response.status_code} — {e.response.text[:300]}")
             full_response = ""
 
     if full_response:
