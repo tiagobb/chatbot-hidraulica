@@ -28,7 +28,7 @@ Comportamento:
 - Responda sempre em português do Brasil"""
 
 TEXT_MODEL = "llama-3.3-70b-versatile"
-VISION_MODEL = "llama-3.2-11b-vision-preview"
+VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 WELCOME_MESSAGE = (
