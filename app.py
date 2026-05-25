@@ -1,6 +1,7 @@
 import streamlit as st
-from google import genai
-from google.genai import types
+import requests
+import json
+import base64
 import PIL.Image
 import io
 import os
@@ -28,6 +29,7 @@ Comportamento:
 - Responda sempre em português do Brasil"""
 
 MODEL = "gemini-2.0-flash"
+
 WELCOME_MESSAGE = (
     "Olá! Sou especialista sênior em manutenção industrial com mais de 20 anos de experiência. "
     "Atuo em hidráulica, elétrica, eletrônica, mecânica, automação e muito mais.\n\n"
@@ -37,6 +39,31 @@ WELCOME_MESSAGE = (
     "- Anexar um **PDF** (manual, esquema, datasheet)\n\n"
     "Como posso ajudá-lo hoje?"
 )
+
+
+def stream_gemini(contents, api_key):
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:streamGenerateContent"
+    params = {"key": api_key, "alt": "sse"}
+    body = {
+        "system_instruction": {"parts": [{"text": SYSTEM_PROMPT}]},
+        "contents": contents,
+        "generationConfig": {"temperature": 0.7},
+    }
+    with requests.post(url, params=params, json=body, stream=True, timeout=120) as resp:
+        resp.raise_for_status()
+        for line in resp.iter_lines():
+            if line:
+                decoded = line.decode("utf-8")
+                if decoded.startswith("data: "):
+                    try:
+                        data = json.loads(decoded[6:])
+                        for candidate in data.get("candidates", []):
+                            for part in candidate.get("content", {}).get("parts", []):
+                                if "text" in part:
+                                    yield part["text"]
+                    except json.JSONDecodeError:
+                        pass
+
 
 st.set_page_config(
     page_title="Técnico Industrial",
@@ -51,8 +78,6 @@ api_key = os.environ.get("GEMINI_API_KEY", "")
 if not api_key:
     st.error("⚠️ Chave da API não encontrada. Configure a variável `GEMINI_API_KEY`.")
     st.stop()
-
-client = genai.Client(api_key=api_key)
 
 if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "assistant", "content": WELCOME_MESSAGE}]
@@ -103,13 +128,14 @@ if prompt := st.chat_input("Descreva o problema ou faça sua pergunta técnica..
     if uploaded_file is not None:
         raw_bytes = uploaded_file.read()
         mime_type = uploaded_file.type
+        b64 = base64.b64encode(raw_bytes).decode("utf-8")
 
         if mime_type.startswith("image/"):
             image_bytes = raw_bytes
-            file_part = types.Part.from_bytes(data=raw_bytes, mime_type=mime_type)
+            file_part = {"inline_data": {"mime_type": mime_type, "data": b64}}
             display_suffix = f"\n\n📷 *[Imagem: {uploaded_file.name}]*"
         elif mime_type == "application/pdf":
-            file_part = types.Part.from_bytes(data=raw_bytes, mime_type="application/pdf")
+            file_part = {"inline_data": {"mime_type": "application/pdf", "data": b64}}
             display_suffix = f"\n\n📄 *[PDF: {uploaded_file.name}]*"
 
     display_text = prompt + display_suffix
@@ -123,7 +149,7 @@ if prompt := st.chat_input("Descreva o problema ou faça sua pergunta técnica..
         if image_bytes:
             st.image(PIL.Image.open(io.BytesIO(image_bytes)), width=380)
 
-    # Monta histórico para a API
+    # Monta histórico para a API REST
     contents = []
     messages_for_api = st.session_state.messages[:-1]
     start = next(
@@ -132,24 +158,24 @@ if prompt := st.chat_input("Descreva o problema ou faça sua pergunta técnica..
     )
     for m in messages_for_api[start:]:
         role = "user" if m["role"] == "user" else "model"
-        contents.append(types.Content(role=role, parts=[types.Part(text=m["content"])]))
+        contents.append({"role": role, "parts": [{"text": m["content"]}]})
 
-    current_parts = [types.Part(text=prompt)]
-    if file_part is not None:
+    current_parts = [{"text": prompt}]
+    if file_part:
         current_parts.append(file_part)
-    contents.append(types.Content(role="user", parts=current_parts))
+    contents.append({"role": "user", "parts": current_parts})
 
     with st.chat_message("assistant"):
         placeholder = st.empty()
         full_response = ""
-        for chunk in client.models.generate_content_stream(
-            model=MODEL,
-            contents=contents,
-            config=types.GenerateContentConfig(system_instruction=SYSTEM_PROMPT),
-        ):
-            if chunk.text:
-                full_response += chunk.text
+        try:
+            for chunk in stream_gemini(contents, api_key):
+                full_response += chunk
                 placeholder.markdown(full_response + "▌")
-        placeholder.markdown(full_response)
+            placeholder.markdown(full_response)
+        except requests.HTTPError as e:
+            placeholder.error(f"Erro na API: {e.response.status_code} — {e.response.text}")
+            full_response = ""
 
-    st.session_state.messages.append({"role": "assistant", "content": full_response})
+    if full_response:
+        st.session_state.messages.append({"role": "assistant", "content": full_response})
