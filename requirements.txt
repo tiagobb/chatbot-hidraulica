@@ -1,3 +1,6 @@
 requests
 streamlit
 Pillow
+supabase
+pypdf
+youtube-transcript-api
