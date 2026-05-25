@@ -34,11 +34,161 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 WELCOME_MESSAGE = (
     "Olá! Sou especialista sênior em manutenção industrial com mais de 20 anos de experiência. "
     "Atuo em hidráulica, elétrica, eletrônica, mecânica, automação e muito mais.\n\n"
-    "Você pode:\n"
-    "- Digitar sua dúvida técnica\n"
-    "- Anexar uma **foto** do equipamento, componente ou problema\n\n"
+    "Você pode digitar sua dúvida técnica ou anexar uma **foto** do equipamento para análise.\n\n"
     "Como posso ajudá-lo hoje?"
 )
+
+CSS = """
+<style>
+/* Esconde elementos padrão do Streamlit */
+#MainMenu, footer, header {visibility: hidden;}
+.stDeployButton {display: none;}
+
+/* Fundo geral */
+.stApp {
+    background-color: #0f1923;
+}
+
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0d1f2d 0%, #1a2f42 100%);
+    border-right: 2px solid #f4a61d;
+}
+[data-testid="stSidebar"] * {
+    color: #e0e0e0 !important;
+}
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {
+    color: #f4a61d !important;
+}
+[data-testid="stSidebar"] hr {
+    border-color: #f4a61d44;
+}
+
+/* Área principal */
+.main .block-container {
+    padding-top: 1rem;
+    max-width: 900px;
+}
+
+/* Header customizado */
+.app-header {
+    background: linear-gradient(135deg, #0d1f2d 0%, #1a3a5c 100%);
+    border-left: 5px solid #f4a61d;
+    border-radius: 8px;
+    padding: 20px 28px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.app-header .icon { font-size: 2.5rem; }
+.app-header h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+}
+.app-header p {
+    margin: 4px 0 0 0;
+    font-size: 0.85rem;
+    color: #f4a61d;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Mensagens do chat */
+[data-testid="stChatMessage"] {
+    background-color: #1a2f42 !important;
+    border-radius: 10px !important;
+    margin-bottom: 10px !important;
+    border: 1px solid #1e3a52 !important;
+    padding: 12px 16px !important;
+    color: #e0e0e0 !important;
+}
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
+    background-color: #12263a !important;
+    border-left: 3px solid #f4a61d !important;
+}
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) {
+    background-color: #1a2f42 !important;
+    border-left: 3px solid #4da8da !important;
+}
+
+/* Texto nas mensagens */
+[data-testid="stChatMessage"] p,
+[data-testid="stChatMessage"] li,
+[data-testid="stChatMessage"] strong {
+    color: #dde8f0 !important;
+}
+
+/* Input do chat */
+[data-testid="stChatInput"] {
+    background-color: #1a2f42 !important;
+    border: 1px solid #f4a61d !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+}
+[data-testid="stChatInput"] textarea {
+    color: #ffffff !important;
+    background-color: #1a2f42 !important;
+}
+
+/* Botão de envio */
+[data-testid="stChatInputSubmitButton"] {
+    background-color: #f4a61d !important;
+    border-radius: 6px !important;
+}
+
+/* Botão limpar */
+.stButton button {
+    background-color: #c0392b !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 6px !important;
+    width: 100% !important;
+    font-weight: 600 !important;
+}
+.stButton button:hover {
+    background-color: #e74c3c !important;
+}
+
+/* Badge de status */
+.status-badge {
+    display: inline-block;
+    background-color: #27ae60;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+}
+
+/* File uploader */
+[data-testid="stFileUploader"] {
+    background-color: #12263a !important;
+    border: 1px dashed #f4a61d !important;
+    border-radius: 8px !important;
+    padding: 8px !important;
+}
+
+/* Divisor */
+.section-title {
+    color: #f4a61d;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #f4a61d44;
+}
+</style>
+"""
 
 
 def stream_groq(api_messages, api_key, model):
@@ -72,57 +222,75 @@ def stream_groq(api_messages, api_key, model):
 
 
 st.set_page_config(
-    page_title="Técnico Industrial",
+    page_title="Técnico Industrial — Manutenção",
     page_icon="⚙️",
     layout="wide",
 )
 
-st.title("⚙️ Técnico Especialista — Manutenção Industrial")
-st.caption("Hidráulica · Elétrica · Automação · Mecânica · Eletrônica")
+st.markdown(CSS, unsafe_allow_html=True)
 
 api_key = os.environ.get("GROQ_API_KEY", "")
 if not api_key:
     st.error("⚠️ Chave da API não encontrada. Configure a variável `GROQ_API_KEY`.")
     st.stop()
 
+# Header principal
+st.markdown("""
+<div class="app-header">
+    <div class="icon">⚙️</div>
+    <div>
+        <h1>Técnico Especialista em Manutenção Industrial</h1>
+        <p>Hidráulica · Elétrica · Automação · Mecânica · Eletrônica · CLP</p>
+        <span class="status-badge">● Online</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
 if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "assistant", "content": WELCOME_MESSAGE}]
 
+# Sidebar
+with st.sidebar:
+    st.markdown('<div class="section-title">📎 Anexar Imagem</div>', unsafe_allow_html=True)
+    uploaded_file = st.file_uploader(
+        "Foto do equipamento",
+        type=["jpg", "jpeg", "png", "webp"],
+        label_visibility="collapsed",
+    )
+    if uploaded_file:
+        st.image(uploaded_file, caption=uploaded_file.name, use_container_width=True)
+        st.caption("📌 Será enviado com sua próxima mensagem.")
+
+    st.markdown("---")
+    st.markdown('<div class="section-title">🏭 Áreas de Expertise</div>', unsafe_allow_html=True)
+    areas = [
+        "🔧 Hidráulica Industrial",
+        "⚡ Elétrica Industrial",
+        "🔌 Eletrônica / VFD",
+        "⚙️ Eletromecânica / CNC",
+        "🔩 Mecânica Industrial",
+        "🌐 Redes Industriais",
+        "🤖 Automação / CLP",
+    ]
+    for area in areas:
+        st.markdown(f"<small>{area}</small>", unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.markdown('<div class="section-title">ℹ️ Informações</div>', unsafe_allow_html=True)
+    st.markdown("<small>Modelo: Llama 3.3 70B<br>Provedor: Groq<br>Versão: 2.0</small>", unsafe_allow_html=True)
+    st.markdown("---")
+    if st.button("🗑️ Limpar Conversa"):
+        st.session_state.messages = [{"role": "assistant", "content": WELCOME_MESSAGE}]
+        st.rerun()
+
+# Histórico do chat
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
         if message.get("image_bytes"):
             st.image(PIL.Image.open(io.BytesIO(message["image_bytes"])), width=380)
 
-with st.sidebar:
-    st.header("📎 Anexar imagem")
-    uploaded_file = st.file_uploader(
-        "Foto do equipamento",
-        type=["jpg", "jpeg", "png", "webp"],
-        help="Anexe uma foto do equipamento ou problema",
-    )
-    if uploaded_file:
-        st.image(uploaded_file, caption=uploaded_file.name, use_container_width=True)
-        st.caption("Será enviado com sua próxima mensagem.")
-
-    st.divider()
-    st.header("ℹ️ Sobre")
-    st.markdown(
-        "Assistente especialista em **manutenção industrial**.\n\n"
-        "**Áreas de expertise:**\n"
-        "- Hidráulica Industrial\n"
-        "- Elétrica Industrial\n"
-        "- Eletrônica / VFD\n"
-        "- Eletromecânica / CNC\n"
-        "- Mecânica Industrial\n"
-        "- Redes Industriais\n"
-        "- Automação / CLP"
-    )
-    st.divider()
-    if st.button("🗑️ Limpar conversa"):
-        st.session_state.messages = [{"role": "assistant", "content": WELCOME_MESSAGE}]
-        st.rerun()
-
+# Input
 if prompt := st.chat_input("Descreva o problema ou faça sua pergunta técnica..."):
     image_bytes = None
     mime_type = None
@@ -144,13 +312,11 @@ if prompt := st.chat_input("Descreva o problema ou faça sua pergunta técnica..
         if image_bytes:
             st.image(PIL.Image.open(io.BytesIO(image_bytes)), width=380)
 
-    # Monta histórico no formato OpenAI
     api_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     for m in st.session_state.messages[:-1]:
         if m["role"] in ("user", "assistant"):
             api_messages.append({"role": m["role"], "content": m["content"]})
 
-    # Mensagem atual com ou sem imagem
     if image_bytes:
         b64 = base64.b64encode(image_bytes).decode("utf-8")
         api_messages.append({
