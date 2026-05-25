@@ -26,7 +26,7 @@ Comportamento:
 - Sugira ferramentas e equipamentos necessários para as intervenções
 - Responda sempre em português do Brasil"""
 
-MODEL = "gemini-1.5-flash"
+MODEL = "gemini-1.5-flash-latest"
 
 WELCOME_MESSAGE = (
     "Olá! Sou especialista sênior em manutenção industrial com mais de 20 anos de experiência. "
