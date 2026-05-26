@@ -7,11 +7,10 @@ import io
 import os
 
 # ══════════════════════════════════════════════════════════════════════════════
-# CONFIGURAÇÕES INICIAIS (Obrigatório ser o primeiro comando Streamlit)
+# 1. CONFIGURAÇÕES INICIAIS E VARIÁVEIS DE AMBIENTE (Top absoluto do código)
 # ══════════════════════════════════════════════════════════════════════════════
 st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="wide")
 
-# Variáveis de Ambiente e Constantes
 SUPABASE_URL   = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY   = os.environ.get("SUPABASE_KEY", "")
 GROQ_API_KEY   = os.environ.get("GROQ_API_KEY", "")
@@ -37,7 +36,7 @@ Responda sempre em português do Brasil."""
 WELCOME_MSG = "Olá! Sou seu assistente técnico experiente. Estou aqui para diagnosticar problemas e sugerir soluções rápidas para seu equipamento. Como posso ajudar?"
 
 # ══════════════════════════════════════════════════════════════════════════════
-# INTERFACE VISUAL (CSS BLINDADO)
+# 2. INTERFACE VISUAL (CSS Customizado)
 # ══════════════════════════════════════════════════════════════════════════════
 CSS = """
 <style>
@@ -50,7 +49,7 @@ CSS = """
 .stApp, .main { background: #12151C !important; }
 .block-container { padding: .8rem .8rem 5rem .8rem !important; max-width: 100% !important; }
 
-/* Flexbox nativo para colunas Streamlit lado a lado sem quebra */
+/* Configuração estável de Flexbox para colunas do Streamlit */
 [data-testid="stColumns"] {
     display: flex !important;
     flex-direction: row !important;
@@ -59,7 +58,7 @@ CSS = """
     gap: 16px !important;
 }
 
-/* Coluna da Esquerda (Painel Lateral Fixo) */
+/* Painel Esquerdo Fixo */
 [data-testid="stColumns"] > div:nth-child(1) {
     min-width: 290px !important;
     max-width: 290px !important;
@@ -70,7 +69,7 @@ CSS = """
     padding: 16px 12px !important;
 }
 
-/* Coluna da Direita (Área Fluida do Chat) */
+/* Área Direita Dinâmica */
 [data-testid="stColumns"] > div:nth-child(2) {
     flex: 1 1 auto !important;
     width: 100% !important;
@@ -105,4 +104,20 @@ CSS = """
 .exp-item .ei { font-size: 1rem; min-width: 18px; }
 
 .status-pill {
-    background: #1
+    background: #12151C; border: 1px solid #1E2435;
+    border-radius: 8px; padding: 10px 14px; margin-top: 16px;
+}
+.status-pill .s-label { font-size: .6rem; color: #5A6478; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 3px; }
+.status-pill .s-val   { font-size: .82rem; color: #2ECC71; font-weight: 600; }
+
+.app-header {
+    background: linear-gradient(135deg, #1A2035 0%, #1E2845 60%, #1A2035 100%);
+    border-radius: 14px; padding: 20px 24px; margin-bottom: 14px;
+    border: 1px solid #2A3555; box-shadow: 0 6px 24px rgba(0,0,0,.3);
+    display: flex; align-items: center; gap: 18px;
+}
+.icon-box {
+    background: #252B3B; border-radius: 10px;
+    width: 54px; height: 54px; display: flex; align-items: center;
+    justify-content: center; font-size: 1.8rem; flex-shrink: 0;
+    border: 1px
