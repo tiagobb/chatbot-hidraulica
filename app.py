@@ -24,7 +24,7 @@ SYSTEM_PROMPT = """Você é um especialista técnico sênior em manutenção ind
 - Mecânica Industrial (transmissões, rolamentos, vedações, pneumática)
 - Automação Industrial (CLPs, Ladder/FBD/ST, PID, Industria 4.0, IIoT)
 - Redes Industriais (Ethernet/IP, Profibus, Modbus, Profinet, SCADA, HMI)
-When houver CONHECIMENTO RELEVANTE DA BASE DE DADOS no contexto, use-o como referência principal, citando a fonte.
+Quando houver CONHECIMENTO RELEVANTE DA BASE DE DADOS no contexto, use-o como referência principal, citando a fonte.
 Use linguagem técnica precisa, cite normas (ISO, NBR, NR), ofereça procedimentos passo a passo.
 Ao receber imagem, analise detalhadamente. Priorize sempre a segurança.
 Responda sempre em português do Brasil."""
@@ -40,137 +40,141 @@ CSS = """
 [data-testid="stSidebar"]        { display: none !important; }
 [data-testid="collapsedControl"] { display: none !important; }
 .stApp, .main { background: #12151C !important; }
-.block-container { padding: 1.2rem 1.2rem 5rem 1.2rem !important; max-width: 100% !important; }
+.block-container { padding: .8rem .8rem 5rem .8rem !important; max-width: 100% !important; }
 
 /* ═══════════════════════════════
    PAINEL ESQUERDO (coluna)
 ═══════════════════════════════ */
 .left-col {
     background: #1C2030;
-    border-radius: 14px;
+    border-radius: 12px;
     border: 1px solid #252B3B;
-    padding: 20px 16px;
+    padding: 16px 12px;
     min-height: 85vh;
 }
 .sec-title {
-    font-size: .68rem; font-weight: 700; letter-spacing: 2px;
-    color: #6C7A96; text-transform: uppercase;
-    border-bottom: 1px solid #252B3B; padding-bottom: 10px; margin-bottom: 14px;
-    margin-top: 10px;
+    font-size: .62rem; font-weight: 700; letter-spacing: 2px;
+    color: #5A6478; text-transform: uppercase;
+    border-bottom: 1px solid #252B3B; padding-bottom: 8px; margin-bottom: 12px;
 }
-/* Upload box personalizado */
+/* Upload button */
 .upload-label {
-    font-size: .8rem; font-weight: 600; color: #A2B1CD; margin-bottom: 8px;
+    font-size: .75rem; font-weight: 600; color: #8A96AD; margin-bottom: 6px;
 }
 .upload-label span { font-weight: 400; color: #5A6478; }
-[data-testid="stFileUploader"] { background: transparent !important; border: none !important; padding: 0 !important; }
+[data-testid="stFileUploader"] { background: transparent !important; border: none !important; }
 [data-testid="stFileDropzone"] {
     background: #12151C !important; border: 1.5px dashed #2D3448 !important;
-    border-radius: 10px !important; padding: 15px 10px !important;
+    border-radius: 8px !important; padding: 10px !important;
 }
 [data-testid="stFileDropzone"] * { color: #8A96AD !important; }
 [data-testid="stFileDropzone"] button {
     background: #252B3B !important; color: #C8D0E0 !important;
-    border: 1px solid #363D55 !important; border-radius: 8px !important;
-    font-size: .8rem !important; padding: 6px 16px !important;
-    font-weight: 500 !important;
+    border: 1px solid #363D55 !important; border-radius: 6px !important;
+    font-size: .78rem !important; padding: 5px 14px !important;
 }
-/* Lista de Expertise */
+/* Expertise list */
 .exp-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 9px 12px; border-radius: 8px; margin-bottom: 6px;
-    background: #151824; border: 1px solid #202637;
-    font-size: .85rem; color: #C8D0E0;
-    transition: all 0.2s;
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px; border-radius: 7px; margin-bottom: 3px;
+    background: #12151C; border: 1px solid #1E2435;
+    font-size: .81rem; color: #C0C8D8;
 }
-.exp-item:hover {
-    background: #1C2132;
-    border-color: #2D364F;
-}
-.exp-item .ei { font-size: 1.1rem; min-width: 22px; text-align: center; }
-
-/* Status Pill */
+.exp-item .ei { font-size: 1rem; min-width: 18px; }
+/* Status */
 .status-pill {
-    background: #12151C; border: 1px solid #22293A;
-    border-radius: 10px; padding: 12px 16px; margin-top: 20px;
+    background: #12151C; border: 1px solid #1E2435;
+    border-radius: 8px; padding: 10px 14px; margin-top: 16px;
 }
-.status-pill .s-label { font-size: .65rem; color: #5A6478; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
-.status-pill .s-val   { font-size: .85rem; color: #2ECC71; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.status-pill .s-label { font-size: .6rem; color: #5A6478; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 3px; }
+.status-pill .s-val   { font-size: .82rem; color: #2ECC71; font-weight: 600; }
 
 /* ═══════════════════════════════
    HEADER PRINCIPAL
 ═══════════════════════════════ */
 .app-header {
-    background: #1C2030;
-    border-radius: 14px; padding: 22px 26px; margin-bottom: 18px;
-    border: 1px solid #252B3B; box-shadow: 0 6px 20px rgba(0,0,0,.2);
+    background: linear-gradient(135deg, #1A2035 0%, #1E2845 60%, #1A2035 100%);
+    border-radius: 14px; padding: 20px 24px; margin-bottom: 14px;
+    border: 1px solid #2A3555; box-shadow: 0 6px 24px rgba(0,0,0,.3);
+    display: flex; align-items: center; gap: 18px;
 }
-.app-header h1 { color: #FFFFFF; font-size: 1.5rem; font-weight: 700; margin: 0 0 6px 0; display: flex; align-items: center; gap: 10px; }
-.app-header .sub { color: #8A96AD; font-size: .88rem; margin: 0; display: flex; align-items: center; gap: 6px; }
+.icon-box {
+    background: #252B3B; border-radius: 10px;
+    width: 54px; height: 54px; display: flex; align-items: center;
+    justify-content: center; font-size: 1.8rem; flex-shrink: 0;
+    border: 1px solid #363D55;
+}
+.app-header h1 { color: #FFFFFF; font-size: 1.35rem; font-weight: 800; margin: 0 0 4px 0; }
+.app-header .sub { color: #7A8BAD; font-size: .78rem; margin: 0; }
 
 /* ═══════════════════════════════
-   BOTÕES DE AÇÃO RÁPIDA (Grid)
+   QUICK ACTION BUTTONS
 ═══════════════════════════════ */
 .stButton > button {
-    background: #1C2030 !important; color: #D8E0F0 !important;
-    border: 1px solid #252B3B !important; border-radius: 10px !important;
-    font-size: .9rem !important; font-weight: 500 !important;
-    padding: 14px 18px !important; transition: all .2s ease-in-out !important;
-    width: 100% !important;
-    text-align: center !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+    background: #1C2030 !important; color: #C8D0E0 !important;
+    border: 1px solid #2D3448 !important; border-radius: 10px !important;
+    font-size: .83rem !important; font-weight: 500 !important;
+    padding: 10px 12px !important; transition: all .2s !important;
 }
 .stButton > button:hover {
-    background: #22273B !important; border-color: #3B4766 !important;
-    color: #FFFFFF !important; transform: translateY(-2px) !important;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.25) !important;
-}
-.stButton > button:active {
-    transform: translateY(0px) !important;
+    background: #252B3B !important; border-color: #4A7AC8 !important;
+    color: #FFFFFF !important; transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(74,122,200,.15) !important;
 }
 
 /* ═══════════════════════════════
-   CHAT E BALÕES
+   CHAT
 ═══════════════════════════════ */
-[data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 8px 0 !important; }
-[data-testid="stChatMessage"] > div { background: transparent !important; padding: 0 !important; }
+[data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 3px 0 !important; }
+[data-testid="stChatMessage"] > div { background: transparent !important; }
 
-/* Balão do assistente (Robô) */
+/* Balão do assistente */
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stMarkdownContainer"] {
     background: #1C2030 !important; border-radius: 4px 14px 14px 14px !important;
-    padding: 14px 18px !important; border: 1px solid #252B3B !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    padding: 12px 16px !important; border: 1px solid #252B3B !important;
 }
 /* Balão do usuário */
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stMarkdownContainer"] {
-    background: linear-gradient(135deg, #1A5C3F, #1E7A52) !important;
-    border-radius: 14px 4px 14px 14px !important; padding: 14px 18px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    background: linear-gradient(135deg, #1A6B4A, #1E8A5E) !important;
+    border-radius: 14px 4px 14px 14px !important; padding: 11px 15px !important;
 }
 [data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li {
-    color: #DEE5F2 !important; font-size: .95rem !important; line-height: 1.6 !important; margin: 0 !important;
+    color: #D8E0F0 !important; font-size: .9rem !important; line-height: 1.65 !important; margin: 0 !important;
 }
-[data-testid="stChatMessage"] strong { color: #FFFFFF !important; font-weight: 600; }
-[data-testid="stChatMessage"] code { background: #12151C !important; color: #FFD269 !important; padding: 3px 6px !important; border-radius: 4px !important; }
-
-/* Avatar customizado fix */
-[data-testid="chatAvatarIcon-assistant"], [data-testid="chatAvatarIcon-user"] {
-    background-color: #252B3B !important;
-}
+[data-testid="stChatMessage"] strong { color: #FFFFFF !important; }
+[data-testid="stChatMessage"] code { background: #12151C !important; color: #FFC857 !important; padding: 2px 5px !important; border-radius: 4px !important; }
 
 /* ═══════════════════════════════
-   INPUT DE TEXTO INFERIOR
+   INPUT
 ═══════════════════════════════ */
-[data-testid="stBottom"] { background: #12151C !important; border-top: 1px solid #1C2030 !important; padding-bottom: 20px !important; }
-[data-testid="stChatInput"] { background: #1C2030 !important; border: 1.5px solid #252B3B !important; border-radius: 12px !important; padding: 4px !important; }
-[data-testid="stChatInput"]:focus-within { border-color: #3B4766 !important; box-shadow: 0 0 0 3px rgba(59,71,102,.2) !important; }
+[data-testid="stBottom"] { background: #12151C !important; border-top: 1px solid #1E2435 !important; }
+[data-testid="stChatInput"] { background: #1C2030 !important; border: 1.5px solid #2D3448 !important; border-radius: 12px !important; }
+[data-testid="stChatInput"]:focus-within { border-color: #4A7AC8 !important; box-shadow: 0 0 0 3px rgba(74,122,200,.12) !important; }
 [data-testid="stChatInput"] > div { background: #1C2030 !important; }
-[data-testid="stChatInput"] textarea { color: #DEE5F2 !important; background: #1C2030 !important; caret-color: #4A7AC8 !important; font-size: 0.95rem !important; }
+[data-testid="stChatInput"] textarea { color: #D8E0F0 !important; background: #1C2030 !important; caret-color: #4A7AC8 !important; }
 [data-testid="stChatInput"] textarea::placeholder { color: #5A6478 !important; }
 
-/* Painel expander de Admin */
-[data-testid="stExpander"] { background: #1C2030 !important; border: 1px solid #252B3B !important; border-radius: 12px !important; margin-bottom: 10px !important; }
+/* ═══════════════════════════════
+   FORM / ADMIN
+═══════════════════════════════ */
+.stTextInput > div > div > input, .stTextArea > div > div > textarea {
+    background: #12151C !important; color: #D8E0F0 !important;
+    border: 1px solid #2D3448 !important; border-radius: 8px !important;
+}
+[data-testid="stExpander"] { background: #1C2030 !important; border: 1px solid #252B3B !important; border-radius: 10px !important; }
 [data-testid="stExpander"] * { color: #D8E0F0 !important; }
+.stAlert { background: #1C2030 !important; border-radius: 8px !important; }
+.source-tag { display:inline-block; padding:2px 8px; border-radius:12px; font-size:.7rem; font-weight:600; }
+.src-pdf     { background:#7f1d1d33; color:#fca5a5; border:1px solid #7f1d1d; }
+.src-youtube { background:#7f1d1d33; color:#f87171; border:1px solid #991b1b; }
+.src-text    { background:#14532d33; color:#86efac; border:1px solid #14532d; }
+
+/* ═══════════════════════════════
+   SCROLLBAR
+═══════════════════════════════ */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #12151C; }
+::-webkit-scrollbar-thumb { background: #2D3448; border-radius: 2px; }
 </style>
 """
 
@@ -289,7 +293,7 @@ if "messages"     not in st.session_state: st.session_state.messages     = [{"ro
 if "quick_prompt" not in st.session_state: st.session_state.quick_prompt = ""
 
 # ══════════════════════════════════════════════════════════════════════════════
-# LAYOUT DE COLUNAS EQUILIBRADO
+# LAYOUT
 # ══════════════════════════════════════════════════════════════════════════════
 col_L, col_R = st.columns([1, 3.2], gap="medium")
 
@@ -299,7 +303,7 @@ col_L, col_R = st.columns([1, 3.2], gap="medium")
 with col_L:
     st.markdown('<div class="left-col">', unsafe_allow_html=True)
 
-    # Foto / Upload
+    # Foto
     st.markdown('<div class="sec-title">RECURSOS ADICIONAIS</div>', unsafe_allow_html=True)
     st.markdown('<div class="upload-label">ANEXAR FOTO <span>(opcional)</span></div>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader("foto", type=["jpg","jpeg","png","webp"],
@@ -308,23 +312,25 @@ with col_L:
         st.image(uploaded_file, use_container_width=True)
         st.caption("✅ Será enviada com a próxima mensagem")
 
-    # Expertise — Ajustada com ícones limpos
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Expertise — lista estática
     st.markdown('<div class="sec-title">ÁREAS DE EXPERTISE</div>', unsafe_allow_html=True)
     for icon, label in [
-        ("🔧", "Hidráulica Industrial"),
-        ("⚡", "Elétrica Industrial"),
-        ("🔌", "Eletrônica / VFD"),
-        ("⚙️", "Eletromecânica / CNC"),
-        ("🔩", "Mecânica Industrial"),
-        ("🤖", "Automação / CLP"),
-        ("🌐", "Redes Industriais"),
+        ("🔧","Hidráulica Industrial"),
+        ("⚡","Elétrica Industrial"),
+        ("🔌","Eletrônica / VFD"),
+        ("⚙️","Eletromecânica / CNC"),
+        ("🔩","Mecânica Industrial"),
+        ("🤖","Automação / CLP"),
+        ("🌐","Redes Industriais"),
     ]:
         st.markdown(f'<div class="exp-item"><span class="ei">{icon}</span>{label}</div>',
                     unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Admin
+    # Admin (oculto por padrão)
     if not st.session_state.get("admin_logged"):
         with st.expander("🔐 Admin", expanded=False):
             pwd = st.text_input("Senha", type="password", label_visibility="collapsed",
@@ -334,7 +340,7 @@ with col_L:
                     st.session_state.admin_logged = True; st.rerun()
                 else: st.error("Senha incorreta")
     else:
-        st.success("✅ Admin Ativo")
+        st.success("✅ Admin")
         if st.button("Sair", use_container_width=True, key="btn_sair"):
             st.session_state.admin_logged = False; st.rerun()
 
@@ -346,26 +352,29 @@ with col_L:
     st.markdown(f"""
     <div class="status-pill">
         <div class="s-label">Sistema Operacional</div>
-        <div class="s-val">● Online <span style="color:#5A6478; font-weight:normal; margin-left:4px;">({kb_count} frags)</span></div>
+        <div class="s-val">● Online · {kb_count} fragmentos</div>
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────
-# COLUNA DIREITA (Área principal do Chat)
+# COLUNA DIREITA
 # ─────────────────────────────────────────────────
 with col_R:
 
-    # Header customizado limpo
+    # Header
     st.markdown("""
     <div class="app-header">
-        <h1>🛠️ Técnico Especialista em Manutenção Industrial</h1>
-        <p class="sub">🧑‍🔧 Mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
+      <div class="icon-box">⚙️</div>
+      <div>
+        <h1>🔧 Técnico Especialista em Manutenção Industrial</h1>
+        <p class="sub">🏆 Mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
+      </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Botões de ação rápida com ícones injetados
+    # Botões de ação rápida (3 fixos)
     b1, b2, b3 = st.columns(3)
     with b1:
         if st.button("🔧 Diagnosticar Falha", use_container_width=True, key="q1"):
@@ -377,7 +386,7 @@ with col_R:
         if st.button("📋 Consultar Esquema", use_container_width=True, key="q3"):
             st.session_state.quick_prompt = "Preciso de ajuda para interpretar ou montar um esquema hidráulico ou elétrico."; st.rerun()
 
-    # Base de conhecimento Admin (Painel de Uploads)
+    # Admin panel
     if st.session_state.get("admin_logged") and sb:
         with st.expander("📚 BASE DE CONHECIMENTO", expanded=False):
             tab1, tab2, tab3, tab4 = st.tabs(["📄 PDF","✍️ Texto","🎥 YouTube","🗂️ Gerenciar"])
@@ -425,7 +434,7 @@ with col_R:
                             if st.button("🗑️", key=f"del_{title}"): delete_doc(title,sb); st.rerun()
                         st.divider()
 
-    # Renderização do histórico de mensagens
+    # Chat messages
     for msg in st.session_state.messages:
         avatar = "🔧" if msg["role"] == "assistant" else "👤"
         with st.chat_message(msg["role"], avatar=avatar):
@@ -433,7 +442,7 @@ with col_R:
             if msg.get("image_bytes"):
                 st.image(PIL.Image.open(io.BytesIO(msg["image_bytes"])), width=300)
 
-    # Execução das ações rápidas (prompts dos botões)
+    # Ação rápida
     if st.session_state.quick_prompt:
         qp = st.session_state.quick_prompt
         st.session_state.quick_prompt = ""
@@ -442,7 +451,7 @@ with col_R:
         full = do_chat(qp, None, None, sb, kb_count)
         if full: st.session_state.messages.append({"role":"assistant","content":full})
 
-# ── Input de texto principal ──────────────────────────────────────────────────
+# ── Chat input ────────────────────────────────────────────────────────────────
 if prompt := st.chat_input("Digite sua pergunta ou anexe uma foto..."):
     uf = st.session_state.get("foto_up")
     img_b, mime, sfx = None, None, ""
