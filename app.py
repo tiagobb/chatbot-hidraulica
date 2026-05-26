@@ -20,7 +20,7 @@ SYSTEM_PROMPT = """Você é um especialista técnico sênior em manutenção ind
 
 WELCOME_MSG = "Olá! Sou seu assistente técnico experiente. Estou aqui para diagnosticar problemas e sugerir soluções rápidas para seu equipamento. Como posso ajudar?"
 
-# ── CSS Avançado para Travar as Colunas Lado a Lado (Flexbox) ──────────────────
+# ── CSS Avançado de Posicionamento Fixo (Evita quebras e tela branca) ──────────
 CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -30,43 +30,48 @@ CSS = """
     box-sizing: border-box;
 }
 
-/* Ocultar elementos nativos do Streamlit */
+/* Ocultar cabeçalhos inúteis do Streamlit */
 #MainMenu, footer, header, .stDeployButton { display: none !important; }
 [data-testid="stToolbar"]        { display: none !important; }
 [data-testid="stSidebar"]        { display: none !important; }
 [data-testid="collapsedControl"] { display: none !important; }
 
-/* Configuração do fundo geral */
+/* Configuração do fundo principal */
 .stApp, .main { 
     background-color: #12151C !important; 
 }
+
+/* Ajusta o espaçamento da página inteira */
 .block-container { 
-    padding: 15px !important; 
+    padding: 20px !important; 
     max-width: 100% !important; 
 }
 
-/* Estrutura Container Flexbox Principal */
-.main-container {
-    display: flex;
-    gap: 20px;
-    width: 100%;
-    align-items: flex-start;
+/* 🏢 FORÇAR LAYOUT LADO A LADO VIA CSS CONVENIENTE */
+/* Aplica comportamento de container nas colunas do Streamlit sem quebrar */
+[data-testid="stColumns"] {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-start !important;
+    gap: 20px !important;
 }
 
-/* PAINEL ESQUERDO FIXO */
-.left-panel {
-    flex: 0 0 280px; /* Largura exata travada */
-    background: #1C2030;
-    border-radius: 12px;
-    border: 1px solid #252B3B;
-    padding: 20px 14px;
+/* Garante que a coluna esquerda (Menu) mantenha largura fixa rígida */
+[data-testid="stColumns"] > div:nth-child(1) {
+    min-width: 290px !important;
+    max-width: 290px !important;
+    flex: 0 0 290px !important;
+    background: #1C2030 !important;
+    border-radius: 12px !important;
+    border: 1px solid #252B3B !important;
+    padding: 20px 14px !important;
 }
 
-/* PAINEL DIREITO DO CHAT */
-.right-panel {
-    flex: 1; /* Ocupa todo o resto do espaço */
-    display: flex;
-    flex-direction: column;
+/* Garante que a coluna direita (Chat) ocupe todo o resto da tela */
+[data-testid="stColumns"] > div:nth-child(2) {
+    flex: 1 1 auto !important;
+    width: 100% !important;
 }
 
 /* Títulos de Seção */
@@ -82,7 +87,7 @@ CSS = """
     margin-top: 10px;
 }
 
-/* Estilização Manual do File Uploader para evitar bugs visuais */
+/* Estilização limpa do File Uploader */
 .upload-label {
     font-size: 13px !important; 
     font-weight: 600 !important; 
@@ -106,14 +111,14 @@ CSS = """
     width: 100%;
 }
 
-/* Lista de Especialidades Enxuta */
+/* Lista de Especialidades */
 .exp-item {
     display: flex; 
     align-items: center; 
     gap: 10px;
     padding: 8px 12px; 
     border-radius: 6px; 
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     background: #12151C; 
     border: 1px solid #252B3B;
     font-size: 13px !important; 
@@ -151,6 +156,20 @@ CSS = """
 }
 .app-header h1 { color: #FFFFFF !important; font-size: 20px !important; font-weight: 700 !important; margin: 0 !important; }
 .app-header .sub { color: #94A3B8 !important; font-size: 13px !important; margin: 4px 0 0 0 !important; }
+
+/* Estilização dos Botões Nativos */
+.stButton > button {
+    background: #1C2030 !important; 
+    color: #C8D0E0 !important;
+    border: 1px solid #252B3B !important; 
+    border-radius: 8px !important;
+    font-size: 13px !important; 
+    padding: 10px 12px !important;
+}
+.stButton > button:hover {
+    border-color: #007ACC !important;
+    color: #FFFFFF !important;
+}
 
 /* Balões das Mensagens */
 [data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 10px 0 !important; }
@@ -219,4 +238,26 @@ def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
         model = VISION_MODEL
     else:
         api.append({"role": "user", "content": prompt})
-        model = TEXT
+        model = TEXT_MODEL
+        
+    with st.chat_message("assistant", avatar="🔧"):
+        ph = st.empty()
+        full = ""
+        try:
+            for chunk in stream_groq(api, GROQ_API_KEY, model):
+                full += chunk
+                ph.markdown(full + "▌")
+            ph.markdown(full)
+        except requests.HTTPError as e:
+            ph.error(f"Erro {e.response.status_code}")
+    return full
+
+# ══════════════════════════════════════════════════════════════════════════════
+st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="wide")
+st.markdown(CSS, unsafe_allow_html=True)
+
+if not GROQ_API_KEY:
+    st.error("⚠️ GROQ_API_KEY não configurada.")
+    st.stop()
+
+sb
