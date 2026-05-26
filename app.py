@@ -17,139 +17,175 @@ VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
 GROQ_URL     = "https://api.groq.com/openai/v1/chat/completions"
 
 SYSTEM_PROMPT = """Você é um especialista técnico sênior em manutenção industrial, com mais de 20 anos de experiência nas seguintes áreas:
-
-- Hidráulica Industrial (circuitos, componentes, óleos, simbologia ISO 1219, servo-hidráulica, hidráulica móvel e estacionária)
+- Hidráulica Industrial (circuitos, componentes, óleos, simbologia ISO 1219, servo-hidráulica)
 - Elétrica Industrial (instalações, motores, quadros de comando, NR-10, NBR 5410, NR-12)
 - Eletrônica Industrial (componentes, inversores de frequência VFD, soft-starters, instrumentação)
 - Eletromecânica (servo-motores, freios eletromagnéticos, CNC)
 - Mecânica Industrial (transmissões, rolamentos, vedações, pneumática)
-- Informática Industrial (redes Ethernet/IP, Profibus, Modbus, Profinet, SCADA, HMI, CMMS)
 - Automação Industrial (CLPs, Ladder/FBD/ST, PID, Industria 4.0, IIoT)
+- Redes Industriais (Ethernet/IP, Profibus, Modbus, Profinet, SCADA, HMI)
 
-Quando houver CONHECIMENTO RELEVANTE DA BASE DE DADOS no contexto, use-o como referência principal para responder, citando a fonte quando pertinente.
+Quando houver CONHECIMENTO RELEVANTE DA BASE DE DADOS no contexto, use-o como referência principal, citando a fonte.
+Use linguagem técnica precisa, cite normas (ISO, NBR, NR), ofereça procedimentos passo a passo.
+Ao receber imagem, analise detalhadamente. Priorize sempre a segurança.
+Responda sempre em português do Brasil."""
 
-Comportamento:
-- Use linguagem técnica precisa e clara
-- Cite normas técnicas relevantes (ISO, NBR, NR, etc.)
-- Ofereça exemplos práticos e procedimentos passo a passo
-- Quando receber uma imagem, analise-a detalhadamente
-- Priorize segurança: sempre alerte sobre riscos
-- Responda sempre em português do Brasil"""
+WELCOME_MESSAGE = "Olá! Sou seu **Técnico Especialista em Manutenção** com mais de 20 anos de experiência.\n\nSelecione a área na barra lateral ou use os atalhos rápidos abaixo para começar."
 
-WELCOME_MESSAGE = (
-    "Olá! Sou seu **Técnico Especialista em Manutenção** com mais de 20 anos de experiência.\n\n"
-    "Posso ajudar com **hidráulica, elétrica, automação, mecânica** e muito mais.\n\n"
-    "Digite sua pergunta, use os botões de ação rápida, ou anexe uma foto do equipamento. 👇"
-)
+# Ações rápidas por área
+AREA_ACTIONS = {
+    "💧 Hidráulica Industrial": [
+        ("🔊 Ruído / Cavitação",        "Estou com ruído excessivo na bomba hidráulica. Como identificar se é cavitação e quais são as causas?"),
+        ("🌡️ Óleo Superaquecido",       "O óleo do sistema hidráulico está superaquecendo acima de 60°C. Quais as principais causas e soluções?"),
+        ("📊 Simbologia de Válvulas",    "Pode me ajudar a interpretar a simbologia ISO 1219 de válvulas hidráulicas?"),
+    ],
+    "⚡ Elétrica Industrial": [
+        ("⚡ Disjuntor Atuando",         "O disjuntor está atuando com frequência. Como identificar a causa — sobrecarga, curto ou falha?"),
+        ("🔥 Motor Aquecendo",           "O motor elétrico está aquecendo além do normal. Quais causas e como medir a temperatura adequadamente?"),
+        ("📋 Verificar NR-10 / NR-12",   "Quais são os principais requisitos da NR-10 para trabalho seguro em instalações elétricas?"),
+    ],
+    "🔌 Eletrônica / VFD": [
+        ("🔴 Falha no Inversor",         "O inversor de frequência está apresentando falha. Como interpretar os códigos de erro mais comuns?"),
+        ("📈 Configurar Rampa VFD",      "Como configurar corretamente a rampa de aceleração e desaceleração em um inversor de frequência?"),
+        ("🔧 Soft-Starter com Problema", "O soft-starter não está acionando o motor. Quais os pontos de verificação?"),
+    ],
+    "⚙️ Eletromecânica / CNC": [
+        ("🎯 Alarme no CNC",             "O CNC está gerando alarme durante o ciclo de trabalho. Como fazer o diagnóstico inicial?"),
+        ("🔩 Servo-Motor com Vibração",  "O servo-motor está vibrando excessivamente. Quais as causas e como ajustar os parâmetros PID?"),
+        ("🛑 Freio Eletromagnético",     "O freio eletromagnético não está liberando corretamente. Como verificar a bobina e o entreferro?"),
+    ],
+    "🔩 Mecânica Industrial": [
+        ("🔊 Rolamento com Ruído",       "O rolamento está com ruído anormal. Como identificar o tipo de falha e o momento de troca?"),
+        ("💨 Vazamento de Vedação",      "Estou com vazamento em vedações. Como selecionar o tipo correto de retentor ou gaxeta?"),
+        ("⚙️ Correia / Transmissão",     "Como fazer o alinhamento correto de polias e verificar a tensão adequada da correia?"),
+    ],
+    "🤖 Automação / CLP": [
+        ("🔴 CLP em Falha",              "O CLP entrou em modo de falha (FAULT). Como fazer o diagnóstico e recovery do sistema?"),
+        ("📝 Lógica Ladder",             "Preciso entender uma lógica Ladder com temporizadores e contadores. Pode explicar?"),
+        ("🌐 Comunicação Modbus",        "Como configurar a comunicação Modbus RTU entre o CLP e um inversor de frequência?"),
+    ],
+    "🌐 Redes Industriais": [
+        ("📡 Falha na Rede Profibus",    "A rede Profibus está com falha de comunicação em um escravo. Como diagnosticar?"),
+        ("🔗 Configurar Ethernet/IP",    "Como configurar um dispositivo Ethernet/IP no CLP e verificar a conexão?"),
+        ("📊 Instalar SCADA/HMI",        "Quais os passos para configurar a comunicação entre um SCADA e o CLP via OPC?"),
+    ],
+}
 
 CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 * { font-family: 'Inter', sans-serif !important; box-sizing: border-box; }
 #MainMenu, footer, header, .stDeployButton { display: none !important; }
-[data-testid="stToolbar"]  { display: none !important; }
-[data-testid="stSidebar"]  { display: none !important; }
+[data-testid="stToolbar"]        { display: none !important; }
+[data-testid="stSidebar"]        { display: none !important; }
 [data-testid="collapsedControl"] { display: none !important; }
-.stApp, .main { background: #0f172a !important; }
+.stApp, .main { background-color: #1A1D24 !important; }
 .block-container { padding: 1rem 1rem 5rem 1rem !important; max-width: 100% !important; }
 
 /* ── PAINEL ESQUERDO ── */
 [data-testid="stColumn"]:first-child {
-    background: #1e293b !important;
-    border-radius: 14px !important;
-    border: 1px solid #2d3f55 !important;
-    padding: 14px 10px !important;
+    background-color: #232732 !important;
+    border-radius: 12px !important;
+    border: 1px solid #2F3545 !important;
+    padding: 0 4px !important;
 }
-[data-testid="stColumn"]:first-child * { color: #e2e8f0 !important; }
-[data-testid="stColumn"]:first-child .stButton > button {
-    background: #0f172a !important; border-color: #334155 !important;
+.panel-title {
+    font-size: .62rem; font-weight: 700; color: #8A99AD;
+    text-transform: uppercase; letter-spacing: 1.8px;
+    padding: 10px 0 8px; border-bottom: 1px solid #2F3545; margin-bottom: 10px;
 }
-.panel-section-title {
-    font-size: .65rem; font-weight: 700; color: #64748b;
-    text-transform: uppercase; letter-spacing: 1.5px;
-    padding-bottom: 8px; border-bottom: 1px solid #334155;
-    margin-bottom: 10px; margin-top: 4px;
-}
-.exp-item {
-    display: flex; align-items: center; gap: 7px;
-    padding: 6px 8px; border-radius: 6px; margin-bottom: 3px;
-    background: #0f172a55; border: 1px solid #334155;
-    font-size: .8rem; color: #cbd5e1;
+.area-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 10px; border-radius: 7px; margin-bottom: 3px;
+    background: #1A1D2444; font-size: .82rem; color: #CBD5E1;
+    cursor: pointer;
 }
 .status-box {
-    background: #0f172a; border: 1px solid #1e293b;
-    border-radius: 8px; padding: 10px 12px; margin-top: 12px;
+    background: #1A1D24; border: 1px solid #2F3545;
+    border-radius: 8px; padding: 10px 12px; margin-top: 14px;
 }
 
-/* ── HEADER ── */
-.app-header {
-    background: linear-gradient(135deg, #0f2d5e 0%, #1e40af 60%, #1e3a5f 100%);
-    border-radius: 14px; padding: 18px 22px 14px;
-    margin-bottom: 12px; border: 1px solid #2563eb44;
-    box-shadow: 0 6px 24px rgba(37,99,235,.2);
-    display: flex; align-items: center; gap: 14px;
+/* ── HEADER / WELCOME CARD ── */
+.welcome-card {
+    background: linear-gradient(135deg, #1E2230 0%, #232732 100%);
+    border-left: 5px solid #007ACC;
+    border-radius: 10px; padding: 20px 24px; margin-bottom: 14px;
+    box-shadow: 0 4px 16px rgba(0,122,204,.1);
 }
-.app-header-icon { font-size: 2.2rem; line-height: 1; }
-.app-header h1 { color: #fff; font-size: 1.3rem; font-weight: 800; margin: 0 0 3px 0; }
-.app-header .sub { color: #93c5fd; font-size: .76rem; margin: 0; }
+.welcome-card h1 { color: #FFFFFF; font-size: 1.4rem; font-weight: 800; margin: 0 0 4px 0; }
+.welcome-card .sub { color: #8A99AD; font-size: .8rem; margin: 0; }
+.area-badge {
+    display: inline-block; background: #007ACC22; border: 1px solid #007ACC55;
+    color: #60AEFF; font-size: .75rem; font-weight: 600;
+    padding: 3px 12px; border-radius: 20px; margin-top: 10px;
+}
 
-/* ── CHAT MESSAGES ── */
-[data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 3px 0 !important; }
+/* ── BOTÕES ── */
+.stButton > button {
+    background-color: #2D323F !important; color: #E0E6F0 !important;
+    border: 1px solid #3A4255 !important; border-radius: 20px !important;
+    font-weight: 500 !important; font-size: .83rem !important;
+    transition: all .2s !important; padding: 8px 14px !important;
+}
+.stButton > button:hover {
+    border-color: #007ACC !important; color: #60AEFF !important;
+    background-color: #282E3D !important;
+}
+
+/* ── CHAT ── */
+[data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 4px 0 !important; }
 [data-testid="stChatMessage"] > div { background: transparent !important; }
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stMarkdownContainer"] {
-    background: #1e293b !important; border-radius: 4px 14px 14px 14px !important;
-    padding: 11px 15px !important; border: 1px solid #334155 !important;
+    background: #232732 !important; border-radius: 4px 14px 14px 14px !important;
+    padding: 12px 16px !important; border: 1px solid #2F3545 !important;
 }
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stMarkdownContainer"] {
-    background: linear-gradient(135deg, #0369a1, #0891b2) !important;
-    border-radius: 14px 4px 14px 14px !important; padding: 10px 14px !important;
+    background: linear-gradient(135deg, #005A99, #007ACC) !important;
+    border-radius: 14px 4px 14px 14px !important; padding: 11px 15px !important;
 }
 [data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li {
-    color: #e2e8f0 !important; font-size: .88rem !important; line-height: 1.65 !important; margin: 0 !important;
+    color: #E2E8F0 !important; font-size: .9rem !important; line-height: 1.65 !important; margin: 0 !important;
 }
-[data-testid="stChatMessage"] strong { color: #f1f5f9 !important; }
-[data-testid="stChatMessage"] code { background: #0f172a !important; color: #fbbf24 !important; padding: 2px 5px !important; border-radius: 4px !important; }
+[data-testid="stChatMessage"] strong { color: #FFFFFF !important; }
+[data-testid="stChatMessage"] code { background: #1A1D24 !important; color: #FFC857 !important; padding: 2px 5px !important; border-radius: 4px !important; }
 
 /* ── INPUT ── */
-[data-testid="stBottom"] { background: #0f172a !important; border-top: 1px solid #1e293b !important; padding: 8px 16px !important; }
-[data-testid="stChatInput"] { background: #1e293b !important; border: 1.5px solid #334155 !important; border-radius: 12px !important; }
-[data-testid="stChatInput"]:focus-within { border-color: #10b981 !important; box-shadow: 0 0 0 3px rgba(16,185,129,.1) !important; }
-[data-testid="stChatInput"] > div { background: #1e293b !important; }
-[data-testid="stChatInput"] textarea { color: #e2e8f0 !important; background: #1e293b !important; caret-color: #10b981 !important; }
+[data-testid="stBottom"] { background: #1A1D24 !important; border-top: 1px solid #2F3545 !important; }
+[data-testid="stChatInput"] { background: #232732 !important; border: 1.5px solid #3A4255 !important; border-radius: 12px !important; }
+[data-testid="stChatInput"]:focus-within { border-color: #007ACC !important; box-shadow: 0 0 0 3px rgba(0,122,204,.12) !important; }
+[data-testid="stChatInput"] > div { background: #232732 !important; }
+[data-testid="stChatInput"] textarea { color: #E2E8F0 !important; background: #232732 !important; caret-color: #007ACC !important; }
 [data-testid="stChatInput"] textarea::placeholder { color: #64748b !important; }
 
-/* ── BUTTONS ── */
-.stButton > button {
-    background: #1e293b !important; color: #e2e8f0 !important;
-    border: 1px solid #334155 !important; border-radius: 8px !important;
-    font-weight: 500 !important; font-size: .82rem !important; transition: all .15s !important;
-}
-.stButton > button:hover { background: #334155 !important; border-color: #3b82f6 !important; color: #fff !important; }
-
-/* ── FORM ELEMENTS ── */
+/* ── FORM INPUTS ── */
 .stTextInput > div > div > input, .stTextArea > div > div > textarea {
-    background: #0f172a !important; color: #e2e8f0 !important;
-    border: 1px solid #334155 !important; border-radius: 8px !important;
+    background: #1A1D24 !important; color: #E2E8F0 !important;
+    border: 1px solid #3A4255 !important; border-radius: 8px !important;
 }
-[data-testid="stFileUploader"] { background: #0f172a !important; border: 1.5px dashed #334155 !important; border-radius: 8px !important; }
-[data-testid="stFileUploader"] * { color: #94a3b8 !important; }
-[data-testid="stExpander"] { background: #1e293b !important; border: 1px solid #334155 !important; border-radius: 10px !important; }
-[data-testid="stExpander"] * { color: #e2e8f0 !important; }
+[data-testid="stFileUploader"] { background: #1A1D24 !important; border: 1.5px dashed #3A4255 !important; border-radius: 8px !important; }
+[data-testid="stFileUploader"] * { color: #8A99AD !important; }
+[data-testid="stExpander"] { background: #232732 !important; border: 1px solid #2F3545 !important; border-radius: 10px !important; }
+[data-testid="stExpander"] * { color: #E2E8F0 !important; }
+[data-testid="stExpander"] summary p { color: #E2E8F0 !important; }
+
+/* ── RADIO (área de seleção) ── */
+[data-testid="stRadio"] label { color: #CBD5E1 !important; font-size: .84rem !important; }
+[data-testid="stRadio"] { gap: 4px !important; }
 
 /* ── SOURCE TAGS ── */
 .source-tag { display:inline-block; padding:2px 8px; border-radius:12px; font-size:.7rem; font-weight:600; }
-.src-pdf { background:#7f1d1d33; color:#fca5a5; border:1px solid #7f1d1d; }
+.src-pdf     { background:#7f1d1d33; color:#fca5a5; border:1px solid #7f1d1d; }
 .src-youtube { background:#7f1d1d33; color:#f87171; border:1px solid #991b1b; }
-.src-text { background:#14532d33; color:#86efac; border:1px solid #14532d; }
+.src-text    { background:#14532d33; color:#86efac; border:1px solid #14532d; }
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: #0f172a; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+::-webkit-scrollbar-track { background: #1A1D24; }
+::-webkit-scrollbar-thumb { background: #3A4255; border-radius: 3px; }
 </style>
 """
 
-# ── Supabase ───────────────────────────────────────────────────────────────────
+# ── Supabase & helpers ─────────────────────────────────────────────────────────
 @st.cache_resource
 def get_supabase():
     from supabase import create_client
@@ -229,242 +265,25 @@ def stream_groq(api_messages, api_key, model):
                     s = d[6:].strip()
                     if s == "[DONE]": break
                     try:
-                        content = json.loads(s)["choices"][0]["delta"].get("content","")
-                        if content: yield content
+                        c = json.loads(s)["choices"][0]["delta"].get("content","")
+                        if c: yield c
                     except: pass
 
-# ══════════════════════════════════════════════════════════════════════════════
-st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="wide")
-st.markdown(CSS, unsafe_allow_html=True)
+def do_rag(query, sb, kb_count):
+    if not sb or kb_count == 0: return ""
+    results = search_knowledge(query, sb)
+    if not results: return ""
+    ctx = "\n\n---\n**CONHECIMENTO DA BASE:**\n"
+    for r in results:
+        ctx += f"\n📚 [{r['title']}]:\n{r['content']}\n"
+    return ctx + "---\n"
 
-if not GROQ_API_KEY:
-    st.error("⚠️ GROQ_API_KEY não configurada.")
-    st.stop()
-
-sb       = get_supabase() if SUPABASE_URL and SUPABASE_KEY else None
-kb_count = count_docs(sb) if sb else 0
-
-if "messages"     not in st.session_state: st.session_state.messages     = [{"role": "assistant", "content": WELCOME_MESSAGE}]
-if "quick_prompt" not in st.session_state: st.session_state.quick_prompt = ""
-
-# ══════════════════════════════════════════════════════════════════════════════
-# LAYOUT: coluna esquerda (painel) + coluna direita (chat)
-# ══════════════════════════════════════════════════════════════════════════════
-col_left, col_right = st.columns([1, 3], gap="medium")
-
-# ─────────────────────────────────────────────────
-# PAINEL ESQUERDO
-# ─────────────────────────────────────────────────
-with col_left:
-    # Recursos adicionais
-    st.markdown('<div class="panel-section-title">RECURSOS ADICIONAIS</div>', unsafe_allow_html=True)
-    st.markdown('<div style="font-size:.76rem;font-weight:600;color:#94a3b8;margin-bottom:5px;">ANEXAR FOTO <span style="font-weight:400;color:#64748b">(opcional)</span></div>', unsafe_allow_html=True)
-    uploaded_file = st.file_uploader("foto", type=["jpg","jpeg","png","webp"], label_visibility="collapsed", key="foto_upload")
-    if uploaded_file:
-        st.image(uploaded_file, use_container_width=True)
-        st.caption("✅ Enviada com próxima mensagem")
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # Áreas de expertise
-    st.markdown('<div class="panel-section-title">ÁREAS DE EXPERTISE</div>', unsafe_allow_html=True)
-    for icon, label in [
-        ("💧","Hidráulica Industrial"), ("⚡","Elétrica Industrial"),
-        ("🔌","Eletrônica / VFD"),     ("⚙️","Eletromecânica / CNC"),
-        ("🔩","Mecânica Industrial"),  ("🤖","Automação / CLP"),
-        ("🌐","Redes Industriais"),
-    ]:
-        st.markdown(f'<div class="exp-item">{icon} {label}</div>', unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # Admin
-    st.markdown('<div class="panel-section-title">🔐 PAINEL ADMIN</div>', unsafe_allow_html=True)
-    if not st.session_state.get("admin_logged"):
-        pwd = st.text_input("Senha", type="password", placeholder="Digite a senha", label_visibility="collapsed", key="admin_pwd")
-        if st.button("Entrar", use_container_width=True, key="btn_entrar"):
-            if pwd == ADMIN_PASSWORD:
-                st.session_state.admin_logged = True
-                st.rerun()
-            else:
-                st.error("Senha incorreta")
-    else:
-        st.success("✅ Admin conectado")
-        if st.button("Sair", use_container_width=True, key="btn_sair"):
-            st.session_state.admin_logged = False
-            st.rerun()
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("🗑️ Nova Conversa", use_container_width=True, key="btn_nova"):
-        st.session_state.messages = [{"role": "assistant", "content": WELCOME_MESSAGE}]
-        st.session_state.quick_prompt = ""
-        st.rerun()
-
-    # Status
-    st.markdown(f"""
-    <div class="status-box">
-        <div style="font-size:.65rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">Sistema Operacional</div>
-        <div style="font-size:.8rem;color:#10b981;font-weight:600;">● Online · {kb_count} fragmentos</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# ─────────────────────────────────────────────────
-# COLUNA DIREITA — CHAT
-# ─────────────────────────────────────────────────
-with col_right:
-
-    # Header
-    st.markdown("""
-    <div class="app-header">
-      <div class="app-header-icon">🔧</div>
-      <div>
-        <h1>Técnico Especialista em Manutenção</h1>
-        <p class="sub">🏆 Mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
-      </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # Botões de ação rápida
-    b1, b2, b3 = st.columns(3)
-    with b1:
-        if st.button("🔧 Diagnosticar Falha", use_container_width=True, key="q1"):
-            st.session_state.quick_prompt = "Preciso diagnosticar uma falha no equipamento. Me faça as perguntas necessárias para identificar o problema."
-            st.rerun()
-    with b2:
-        if st.button("🔍 Identificar Componente", use_container_width=True, key="q2"):
-            st.session_state.quick_prompt = "Preciso identificar um componente hidráulico ou elétrico. Como posso descrevê-lo para você identificar?"
-            st.rerun()
-    with b3:
-        if st.button("📋 Consultar Esquema", use_container_width=True, key="q3"):
-            st.session_state.quick_prompt = "Preciso de ajuda para interpretar ou montar um esquema hidráulico ou elétrico."
-            st.rerun()
-
-    # Admin panel expandido
-    if st.session_state.get("admin_logged") and sb:
-        with st.expander("📚 BASE DE CONHECIMENTO — Adicionar / Gerenciar", expanded=True):
-            tab1, tab2, tab3, tab4 = st.tabs(["📄 PDF","✍️ Texto","🎥 YouTube","🗂️ Gerenciar"])
-            with tab1:
-                pdf_title = st.text_input("Título", placeholder="Ex: Manual Bomba Rexroth A10V", key="pdf_title")
-                pdf_file  = st.file_uploader("PDF", type=["pdf"], key="pdf_upload")
-                if st.button("📤 Processar e Salvar", key="btn_pdf"):
-                    if not pdf_title: st.warning("Digite um título.")
-                    elif not pdf_file: st.warning("Selecione um PDF.")
-                    else:
-                        with st.spinner("Processando..."):
-                            text = extract_pdf(pdf_file.read())
-                            if text.startswith("Erro"): st.error(text)
-                            else:
-                                n = upload_doc(pdf_title, text, "pdf", pdf_file.name, sb)
-                                st.success(f"✅ {n} fragmentos salvos!"); st.rerun()
-            with tab2:
-                txt_title   = st.text_input("Título", placeholder="Ex: Procedimento Troca de Óleo", key="txt_title")
-                txt_content = st.text_area("Conteúdo", placeholder="Cole o texto técnico aqui...", height=160, key="txt_content")
-                if st.button("💾 Salvar", key="btn_txt"):
-                    if not txt_title: st.warning("Digite um título.")
-                    elif not txt_content: st.warning("Digite o conteúdo.")
-                    else:
-                        with st.spinner("Salvando..."):
-                            n = upload_doc(txt_title, txt_content, "text", "manual", sb)
-                            st.success(f"✅ {n} fragmentos salvos!"); st.rerun()
-            with tab3:
-                yt_title = st.text_input("Título", placeholder="Ex: Aula Hidráulica Industrial", key="yt_title")
-                yt_url   = st.text_input("URL do YouTube", placeholder="https://youtube.com/watch?v=...", key="yt_url")
-                st.caption("⚠️ O vídeo precisa ter legendas em português ou inglês.")
-                if st.button("📥 Extrair e Salvar", key="btn_yt"):
-                    if not yt_title: st.warning("Digite um título.")
-                    elif not yt_url: st.warning("Digite a URL.")
-                    else:
-                        with st.spinner("Extraindo..."):
-                            text, error = get_youtube_transcript(yt_url)
-                            if error: st.error(f"Erro: {error}")
-                            else:
-                                n = upload_doc(yt_title, text, "youtube", yt_url, sb)
-                                st.success(f"✅ {n} fragmentos salvos!"); st.rerun()
-            with tab4:
-                docs = get_all_docs(sb)
-                if not docs: st.info("Base vazia.")
-                else:
-                    for title in list({d["title"] for d in docs}):
-                        chunks = [d for d in docs if d["title"] == title]
-                        src    = chunks[0]["source_type"]
-                        color  = {"pdf":"src-pdf","youtube":"src-youtube","text":"src-text"}.get(src,"src-text")
-                        c1, c2 = st.columns([5,1])
-                        with c1:
-                            st.markdown(f'<span class="source-tag {color}">{src.upper()}</span> **{title}** <small style="color:#64748b">({len(chunks)} frag.)</small>', unsafe_allow_html=True)
-                        with c2:
-                            if st.button("🗑️", key=f"del_{title}"):
-                                delete_doc(title, sb); st.rerun()
-                        st.divider()
-
-    # Mensagens do chat
-    for msg in st.session_state.messages:
-        with st.chat_message(msg["role"]):
-            st.markdown(msg["content"])
-            if msg.get("image_bytes"):
-                st.image(PIL.Image.open(io.BytesIO(msg["image_bytes"])), width=300)
-
-    # Ação rápida
-    if st.session_state.quick_prompt:
-        qp = st.session_state.quick_prompt
-        st.session_state.quick_prompt = ""
-        with st.chat_message("user"):
-            st.markdown(qp)
-        st.session_state.messages.append({"role":"user","content": qp})
-
-        rag = ""
-        if sb and kb_count > 0:
-            results = search_knowledge(qp, sb)
-            if results:
-                rag = "\n\n---\n**CONHECIMENTO DA BASE:**\n" + "".join(f"\n📚 [{r['title']}]:\n{r['content']}\n" for r in results) + "---\n"
-
-        api_msgs = [{"role":"system","content": SYSTEM_PROMPT + rag}]
-        for m in st.session_state.messages[:-1]:
-            if m["role"] in ("user","assistant"):
-                api_msgs.append({"role":m["role"],"content":m["content"]})
-        api_msgs.append({"role":"user","content": qp})
-
-        with st.chat_message("assistant"):
-            ph = st.empty(); full = ""
-            try:
-                for chunk in stream_groq(api_msgs, GROQ_API_KEY, TEXT_MODEL):
-                    full += chunk; ph.markdown(full + "▌")
-                ph.markdown(full)
-            except Exception as e:
-                ph.error(str(e)[:200]); full = ""
-        if full:
-            st.session_state.messages.append({"role":"assistant","content": full})
-
-# ── Chat input (sempre no rodapé) ─────────────────────────────────────────────
-if prompt := st.chat_input("Digite sua pergunta ou descreva o problema..."):
-    image_bytes, mime_type, display_suffix = None, None, ""
-    uploaded_file = st.session_state.get("foto_upload")
-    if uploaded_file:
-        image_bytes    = uploaded_file.read()
-        mime_type      = uploaded_file.type
-        display_suffix = f"\n\n📷 *[{uploaded_file.name}]*"
-
-    display_text = prompt + display_suffix
-    user_msg = {"role":"user","content": display_text}
-    if image_bytes: user_msg["image_bytes"] = image_bytes
-    st.session_state.messages.append(user_msg)
-
-    with col_right:
-        with st.chat_message("user"):
-            st.markdown(display_text)
-            if image_bytes:
-                st.image(PIL.Image.open(io.BytesIO(image_bytes)), width=300)
-
-    rag = ""
-    if sb and kb_count > 0:
-        results = search_knowledge(prompt, sb)
-        if results:
-            rag = "\n\n---\n**CONHECIMENTO DA BASE:**\n" + "".join(f"\n📚 [{r['title']}]:\n{r['content']}\n" for r in results) + "---\n"
-
+def send_message(prompt, image_bytes, mime_type, sb, kb_count):
+    rag = do_rag(prompt, sb, kb_count)
     api_msgs = [{"role":"system","content": SYSTEM_PROMPT + rag}]
     for m in st.session_state.messages[:-1]:
         if m["role"] in ("user","assistant"):
             api_msgs.append({"role":m["role"],"content":m["content"]})
-
     if image_bytes:
         b64 = base64.b64encode(image_bytes).decode()
         api_msgs.append({"role":"user","content":[
@@ -476,16 +295,196 @@ if prompt := st.chat_input("Digite sua pergunta ou descreva o problema..."):
         api_msgs.append({"role":"user","content": prompt})
         model = TEXT_MODEL
 
-    with col_right:
-        with st.chat_message("assistant"):
-            if rag: st.caption("📚 Consultando base de conhecimento...")
-            ph = st.empty(); full = ""
-            try:
-                for chunk in stream_groq(api_msgs, GROQ_API_KEY, model):
-                    full += chunk; ph.markdown(full + "▌")
-                ph.markdown(full)
-            except requests.HTTPError as e:
-                ph.error(f"Erro {e.response.status_code}: {e.response.text[:200]}"); full = ""
+    with st.chat_message("assistant", avatar="🔧"):
+        if rag: st.caption("📚 Consultando base de conhecimento...")
+        ph = st.empty(); full = ""
+        try:
+            for chunk in stream_groq(api_msgs, GROQ_API_KEY, model):
+                full += chunk; ph.markdown(full + "▌")
+            ph.markdown(full)
+        except requests.HTTPError as e:
+            ph.error(f"Erro {e.response.status_code}: {e.response.text[:200]}"); full = ""
+    return full
 
-    if full:
-        st.session_state.messages.append({"role":"assistant","content": full})
+# ══════════════════════════════════════════════════════════════════════════════
+st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="wide")
+st.markdown(CSS, unsafe_allow_html=True)
+
+if not GROQ_API_KEY:
+    st.error("⚠️ GROQ_API_KEY não configurada."); st.stop()
+
+sb       = get_supabase() if SUPABASE_URL and SUPABASE_KEY else None
+kb_count = count_docs(sb) if sb else 0
+
+if "messages"     not in st.session_state: st.session_state.messages     = [{"role":"assistant","content": WELCOME_MESSAGE}]
+if "quick_prompt" not in st.session_state: st.session_state.quick_prompt = ""
+
+areas_list = list(AREA_ACTIONS.keys())
+
+# ══════════════════════════════════════════════════════════════════════════════
+# LAYOUT: coluna esquerda + coluna direita
+# ══════════════════════════════════════════════════════════════════════════════
+col_left, col_right = st.columns([1, 3], gap="medium")
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PAINEL ESQUERDO
+# ─────────────────────────────────────────────────────────────────────────────
+with col_left:
+    # Foto
+    st.markdown('<div class="panel-title">📎 Anexar Foto (opcional)</div>', unsafe_allow_html=True)
+    with st.expander("📸 Selecionar / Tirar Foto", expanded=False):
+        uploaded_file = st.file_uploader("foto", type=["jpg","jpeg","png","webp"], label_visibility="collapsed", key="foto_up")
+        if uploaded_file:
+            st.image(uploaded_file, use_container_width=True)
+            st.caption("✅ Será enviada com a próxima mensagem")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Área de análise (radio dinâmico)
+    st.markdown('<div class="panel-title">⚙️ Área de Análise</div>', unsafe_allow_html=True)
+    area_selecionada = st.radio(
+        "area", areas_list,
+        label_visibility="collapsed",
+        key="area_radio"
+    )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Admin
+    st.markdown('<div class="panel-title">🔐 Painel Admin</div>', unsafe_allow_html=True)
+    if not st.session_state.get("admin_logged"):
+        pwd = st.text_input("Senha", type="password", placeholder="Senha admin", label_visibility="collapsed", key="pwd")
+        if st.button("Entrar", use_container_width=True, key="btn_login"):
+            if pwd == ADMIN_PASSWORD:
+                st.session_state.admin_logged = True; st.rerun()
+            else:
+                st.error("Senha incorreta")
+    else:
+        st.success("✅ Admin")
+        if st.button("Sair", use_container_width=True, key="btn_sair"):
+            st.session_state.admin_logged = False; st.rerun()
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("🗑️ Nova Conversa", use_container_width=True, key="btn_nova"):
+        st.session_state.messages = [{"role":"assistant","content": WELCOME_MESSAGE}]
+        st.session_state.quick_prompt = ""
+        st.rerun()
+
+    # Status
+    st.markdown(f"""
+    <div class="status-box">
+        <div style="font-size:.62rem;color:#8A99AD;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">Sistema Operacional</div>
+        <div style="font-size:.82rem;color:#2ECC71;font-weight:600;">● Conectado · {kb_count} fragmentos</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# COLUNA DIREITA
+# ─────────────────────────────────────────────────────────────────────────────
+with col_right:
+
+    # Welcome card
+    st.markdown(f"""
+    <div class="welcome-card">
+        <h1>🔧 Técnico Especialista em Manutenção</h1>
+        <p class="sub">🏆 Mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
+        <span class="area-badge">Foco atual: {area_selecionada[2:]}</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Atalhos rápidos dinâmicos por área
+    actions = AREA_ACTIONS.get(area_selecionada, [])
+    b1, b2, b3 = st.columns(3)
+    for col_btn, (label, prompt_text) in zip([b1, b2, b3], actions):
+        with col_btn:
+            if st.button(label, use_container_width=True, key=f"btn_{label}"):
+                st.session_state.quick_prompt = prompt_text
+                st.rerun()
+
+    # Admin panel expandido
+    if st.session_state.get("admin_logged") and sb:
+        with st.expander("📚 BASE DE CONHECIMENTO — Adicionar / Gerenciar", expanded=False):
+            tab1, tab2, tab3, tab4 = st.tabs(["📄 PDF","✍️ Texto","🎥 YouTube","🗂️ Gerenciar"])
+            with tab1:
+                pt = st.text_input("Título", placeholder="Ex: Manual Bomba Rexroth A10V", key="pdf_t")
+                pf = st.file_uploader("PDF", type=["pdf"], key="pdf_f")
+                if st.button("📤 Salvar PDF", key="btn_pdf"):
+                    if not pt: st.warning("Digite um título.")
+                    elif not pf: st.warning("Selecione um PDF.")
+                    else:
+                        with st.spinner("Processando..."):
+                            text = extract_pdf(pf.read())
+                            if text.startswith("Erro"): st.error(text)
+                            else: st.success(f"✅ {upload_doc(pt, text, 'pdf', pf.name, sb)} fragmentos!"); st.rerun()
+            with tab2:
+                tt = st.text_input("Título", placeholder="Ex: Procedimento Troca de Óleo", key="txt_t")
+                tc = st.text_area("Conteúdo", placeholder="Cole o texto técnico aqui...", height=150, key="txt_c")
+                if st.button("💾 Salvar Texto", key="btn_txt"):
+                    if not tt: st.warning("Digite um título.")
+                    elif not tc: st.warning("Digite o conteúdo.")
+                    else:
+                        with st.spinner("Salvando..."): st.success(f"✅ {upload_doc(tt, tc, 'text', 'manual', sb)} fragmentos!"); st.rerun()
+            with tab3:
+                yt = st.text_input("Título", placeholder="Ex: Aula Hidráulica Industrial", key="yt_t")
+                yu = st.text_input("URL YouTube", placeholder="https://youtube.com/watch?v=...", key="yt_u")
+                if st.button("📥 Extrair e Salvar", key="btn_yt"):
+                    if not yt: st.warning("Digite um título.")
+                    elif not yu: st.warning("Digite a URL.")
+                    else:
+                        with st.spinner("Extraindo..."):
+                            text, err = get_youtube_transcript(yu)
+                            if err: st.error(f"Erro: {err}")
+                            else: st.success(f"✅ {upload_doc(yt, text, 'youtube', yu, sb)} fragmentos!"); st.rerun()
+            with tab4:
+                docs = get_all_docs(sb)
+                if not docs: st.info("Base vazia.")
+                else:
+                    for title in list({d["title"] for d in docs}):
+                        chunks = [d for d in docs if d["title"] == title]
+                        src = chunks[0]["source_type"]
+                        color = {"pdf":"src-pdf","youtube":"src-youtube","text":"src-text"}.get(src,"src-text")
+                        c1, c2 = st.columns([5,1])
+                        with c1: st.markdown(f'<span class="source-tag {color}">{src.upper()}</span> **{title}** <small style="color:#8A99AD">({len(chunks)} frag.)</small>', unsafe_allow_html=True)
+                        with c2:
+                            if st.button("🗑️", key=f"del_{title}"): delete_doc(title, sb); st.rerun()
+                        st.divider()
+
+    # Mensagens
+    for msg in st.session_state.messages:
+        avatar = "🔧" if msg["role"] == "assistant" else "👤"
+        with st.chat_message(msg["role"], avatar=avatar):
+            st.markdown(msg["content"])
+            if msg.get("image_bytes"):
+                st.image(PIL.Image.open(io.BytesIO(msg["image_bytes"])), width=300)
+
+    # Atalho rápido
+    if st.session_state.quick_prompt:
+        qp = st.session_state.quick_prompt
+        st.session_state.quick_prompt = ""
+        with st.chat_message("user", avatar="👤"):
+            st.markdown(qp)
+        st.session_state.messages.append({"role":"user","content": qp})
+        full = send_message(qp, None, None, sb, kb_count)
+        if full: st.session_state.messages.append({"role":"assistant","content": full})
+
+# ── Chat input ────────────────────────────────────────────────────────────────
+if prompt := st.chat_input("Descreva o problema técnico ou faça sua pergunta..."):
+    uploaded_file = st.session_state.get("foto_up")
+    image_bytes, mime_type, suffix = None, None, ""
+    if uploaded_file:
+        image_bytes = uploaded_file.read()
+        mime_type   = uploaded_file.type
+        suffix      = f"\n\n📷 *[{uploaded_file.name}]*"
+
+    display = prompt + suffix
+    user_msg = {"role":"user","content": display}
+    if image_bytes: user_msg["image_bytes"] = image_bytes
+    st.session_state.messages.append(user_msg)
+
+    with col_right:
+        with st.chat_message("user", avatar="👤"):
+            st.markdown(display)
+            if image_bytes: st.image(PIL.Image.open(io.BytesIO(image_bytes)), width=300)
+
+        full = send_message(prompt, image_bytes, mime_type, sb, kb_count)
+        if full: st.session_state.messages.append({"role":"assistant","content": full})
