@@ -135,8 +135,10 @@ CSS = """
 [data-testid="stBottom"] { background-color: #0f172a !important; border-top: 1px solid #1e293b !important; }
 [data-testid="stChatInput"] { background-color: #1e293b !important; border: 1.5px solid #334155 !important; border-radius: 12px !important; }
 [data-testid="stChatInput"]:focus-within { border-color: #10b981 !important; box-shadow: 0 0 0 3px rgba(16,185,129,.12) !important; }
-[data-testid="stChatInput"] textarea { color: #f1f5f9 !important; background: transparent !important; }
+[data-testid="stChatInput"] > div { background-color: #1e293b !important; }
+[data-testid="stChatInput"] textarea { color: #e2e8f0 !important; background-color: #1e293b !important; caret-color: #10b981 !important; }
 [data-testid="stChatInput"] textarea::placeholder { color: #64748b !important; }
+[data-testid="stChatInput"] * { color: #e2e8f0 !important; background-color: #1e293b !important; }
 
 /* ── File uploader ── */
 [data-testid="stFileUploader"] { background: #0f172a !important; border: 1.5px dashed #334155 !important; border-radius: 10px !important; }
