@@ -163,7 +163,11 @@ CSS = """
     border: 1px solid #3A4255 !important; border-radius: 8px !important;
 }
 [data-testid="stFileUploader"] { background: #1A1D24 !important; border: 1.5px dashed #3A4255 !important; border-radius: 8px !important; }
-[data-testid="stFileUploader"] * { color: #8A99AD !important; }
+[data-testid="stFileUploader"] > div { background: #1A1D24 !important; }
+[data-testid="stFileUploader"] section { background: #1A1D24 !important; border: none !important; }
+[data-testid="stFileUploader"] * { color: #8A99AD !important; background: transparent !important; }
+[data-testid="stFileDropzoneInstructions"] { background: #1A1D24 !important; }
+[data-testid="stFileDropzone"] { background: #1A1D24 !important; border: 1.5px dashed #3A4255 !important; border-radius: 8px !important; }
 [data-testid="stExpander"] { background: #232732 !important; border: 1px solid #2F3545 !important; border-radius: 10px !important; }
 [data-testid="stExpander"] * { color: #E2E8F0 !important; }
 [data-testid="stExpander"] summary p { color: #E2E8F0 !important; }
@@ -344,7 +348,7 @@ col_left, col_right = st.columns([1, 3], gap="medium")
 with col_left:
     # Foto
     st.markdown('<div class="panel-title">📎 Anexar Foto (opcional)</div>', unsafe_allow_html=True)
-    uploaded_file = st.file_uploader("Selecione ou tire uma foto", type=["jpg","jpeg","png","webp"], key="foto_up")
+    uploaded_file = st.file_uploader("foto", type=["jpg","jpeg","png","webp"], key="foto_up", label_visibility="collapsed")
     if uploaded_file:
         st.image(uploaded_file, use_container_width=True)
         st.caption("✅ Será enviada com a próxima mensagem")
