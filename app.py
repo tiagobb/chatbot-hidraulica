@@ -24,13 +24,14 @@ SYSTEM_PROMPT = """Você é um especialista técnico sênior em manutenção ind
 - Mecânica Industrial (transmissões, rolamentos, vedações, pneumática)
 - Automação Industrial (CLPs, Ladder/FBD/ST, PID, Industria 4.0, IIoT)
 - Redes Industriais (Ethernet/IP, Profibus, Modbus, Profinet, SCADA, HMI)
-When houver CONHECIMENTO RELEVANTE DA BASE DE DADOS no contexto, use-o como referência principal, citando a fonte.
+Quando houver CONHECIMENTO RELEVANTE DA BASE DE DADOS no contexto, use-o como referência principal, citando a fonte.
 Use linguagem técnica precisa, cite normas (ISO, NBR, NR), ofereça procedimentos passo a passo.
 Ao receber imagem, analise detalhadamente. Priorize sempre a segurança.
 Responda sempre em português do Brasil."""
 
 WELCOME_MSG = "Olá! Sou seu assistente técnico experiente. Estou aqui para diagnosticar problemas e sugerir soluções rápidas para seu equipamento. Como posso ajudar?"
 
+# ── CSS Modificado para Design Industrial Premium ─────────────────────────────
 CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -39,138 +40,146 @@ CSS = """
 [data-testid="stToolbar"]        { display: none !important; }
 [data-testid="stSidebar"]        { display: none !important; }
 [data-testid="collapsedControl"] { display: none !important; }
-.stApp, .main { background: #12151C !important; }
-.block-container { padding: 1.2rem 1.2rem 5rem 1.2rem !important; max-width: 100% !important; }
+
+/* Fundo Geral Grafite Escuro */
+.stApp, .main { background: #1A1D24 !important; }
+.block-container { padding: 1rem 1.5rem 5rem 1.5rem !important; max-width: 100% !important; }
 
 /* ═══════════════════════════════
-   PAINEL ESQUERDO (coluna)
+   PAINEL ESQUERDO (COLUNA)
 ═══════════════════════════════ */
 .left-col {
-    background: #1C2030;
-    border-radius: 14px;
-    border: 1px solid #252B3B;
+    background: #232732;
+    border-radius: 12px;
+    border: 1px solid #2F3545;
     padding: 20px 16px;
-    min-height: 85vh;
+    min-height: 88vh;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 .sec-title {
-    font-size: .68rem; font-weight: 700; letter-spacing: 2px;
-    color: #6C7A96; text-transform: uppercase;
-    border-bottom: 1px solid #252B3B; padding-bottom: 10px; margin-bottom: 14px;
+    font-size: .68rem; font-weight: 700; letter-spacing: 1.5px;
+    color: #8A99AD; text-transform: uppercase;
+    border-bottom: 1px solid #2F3545; padding-bottom: 8px; margin-bottom: 14px;
     margin-top: 10px;
 }
-/* Upload box personalizado */
+/* Upload Box Compacto */
 .upload-label {
-    font-size: .8rem; font-weight: 600; color: #A2B1CD; margin-bottom: 8px;
+    font-size: .8rem; font-weight: 600; color: #E2E8F0; margin-bottom: 8px;
 }
-.upload-label span { font-weight: 400; color: #5A6478; }
-[data-testid="stFileUploader"] { background: transparent !important; border: none !important; padding: 0 !important; }
+.upload-label span { font-weight: 400; color: #8A99AD; }
+[data-testid="stFileUploader"] { background: transparent !important; border: none !important; }
 [data-testid="stFileDropzone"] {
-    background: #12151C !important; border: 1.5px dashed #2D3448 !important;
-    border-radius: 10px !important; padding: 15px 10px !important;
+    background: #1A1D24 !important; border: 1.5px dashed #3D4559 !important;
+    border-radius: 8px !important; padding: 12px !important;
 }
-[data-testid="stFileDropzone"] * { color: #8A96AD !important; }
+[data-testid="stFileDropzone"] * { color: #8A99AD !important; }
 [data-testid="stFileDropzone"] button {
-    background: #252B3B !important; color: #C8D0E0 !important;
-    border: 1px solid #363D55 !important; border-radius: 8px !important;
+    background: #2D323F !important; color: #E2E8F0 !important;
+    border: 1px solid #3D4559 !important; border-radius: 6px !important;
     font-size: .8rem !important; padding: 6px 16px !important;
-    font-weight: 500 !important;
+    width: 100%;
 }
-/* Lista de Expertise */
-.exp-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 9px 12px; border-radius: 8px; margin-bottom: 6px;
-    background: #151824; border: 1px solid #202637;
-    font-size: .85rem; color: #C8D0E0;
-    transition: all 0.2s;
-}
-.exp-item:hover {
-    background: #1C2132;
-    border-color: #2D364F;
-}
-.exp-item .ei { font-size: 1.1rem; min-width: 22px; text-align: center; }
 
-/* Status Pill */
-.status-pill {
-    background: #12151C; border: 1px solid #22293A;
-    border-radius: 10px; padding: 12px 16px; margin-top: 20px;
+/* Áreas de Expertise Estilizadas em Radio Menu */
+[data-testid="stRadio"] > label { display: none !important; }
+[data-testid="stRadio"] div[role="radiogroup"] { gap: 6px !important; }
+[data-testid="stRadio"] div[role="radiogroup"] label {
+    background: #1A1D24 !important;
+    border: 1px solid #2F3545 !important;
+    padding: 10px 14px !important;
+    border-radius: 8px !important;
+    color: #C0C8D8 !important;
+    font-size: .85rem !important;
+    transition: all 0.2s ease;
+    width: 100%;
+    margin: 0 !important;
 }
-.status-pill .s-label { font-size: .65rem; color: #5A6478; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+/* Efeito de seleção da Área Técnica ativa com o Azul Hidráulico */
+[data-testid="stRadio"] div[role="radiogroup"] label[data-checked="true"] {
+    border-color: #007ACC !important;
+    background: #1F2430 !important;
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+    box-shadow: inset 4px 0px 0px #007ACC !important;
+}
+
+/* Status do Sistema na Base */
+.status-pill {
+    background: #1A1D24; border: 1px solid #2F3545;
+    border-radius: 8px; padding: 12px 14px; margin-top: 25px;
+}
+.status-pill .s-label { font-size: .62rem; color: #8A99AD; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
 .status-pill .s-val   { font-size: .85rem; color: #2ECC71; font-weight: 600; display: flex; align-items: center; gap: 6px; }
 
 /* ═══════════════════════════════
-   HEADER PRINCIPAL
+   HEADER PRINCIPAL (TÉCNICO EM MANUTENÇÃO)
 ═══════════════════════════════ */
 .app-header {
-    background: #1C2030;
-    border-radius: 14px; padding: 22px 26px; margin-bottom: 18px;
-    border: 1px solid #252B3B; box-shadow: 0 6px 20px rgba(0,0,0,.2);
+    background: linear-gradient(135deg, #232732 0%, #1A1D24 100%);
+    border-radius: 12px; padding: 24px; margin-bottom: 20px;
+    border: 1px solid #2F3545; 
+    border-left: 6px solid #007ACC; /* Barra lateral Azul Hidráulico */
+    box-shadow: 0 4px 15px rgba(0,0,0,.2);
+    display: flex; align-items: center; gap: 20px;
 }
-.app-header h1 { color: #FFFFFF; font-size: 1.5rem; font-weight: 700; margin: 0 0 6px 0; display: flex; align-items: center; gap: 10px; }
-.app-header .sub { color: #8A96AD; font-size: .88rem; margin: 0; display: flex; align-items: center; gap: 6px; }
+.icon-box {
+    background: #2D323F; border-radius: 10px;
+    width: 60px; height: 60px; display: flex; align-items: center;
+    justify-content: center; font-size: 2rem; flex-shrink: 0;
+    border: 1px solid #3D4559;
+}
+.app-header h1 { color: #FFFFFF; font-size: 1.6rem; font-weight: 700; margin: 0 0 6px 0; letter-spacing: 0.5px; }
+.app-header .sub { color: #8A99AD; font-size: .88rem; margin: 0; }
 
 /* ═══════════════════════════════
-   BOTÕES DE AÇÃO RÁPIDA (Grid)
+   BOTÕES DE AÇÃO RÁPIDA (QUICK ACTIONS)
 ═══════════════════════════════ */
 .stButton > button {
-    background: #1C2030 !important; color: #D8E0F0 !important;
-    border: 1px solid #252B3B !important; border-radius: 10px !important;
+    width: 100%;
+    background: #232732 !important; color: #E2E8F0 !important;
+    border: 1px solid #2F3545 !important; border-radius: 8px !important;
     font-size: .9rem !important; font-weight: 500 !important;
-    padding: 14px 18px !important; transition: all .2s ease-in-out !important;
-    width: 100% !important;
-    text-align: center !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
+    padding: 12px 14px !important; transition: all .2s ease !important;
 }
 .stButton > button:hover {
-    background: #22273B !important; border-color: #3B4766 !important;
-    color: #FFFFFF !important; transform: translateY(-2px) !important;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.25) !important;
-}
-.stButton > button:active {
-    transform: translateY(0px) !important;
+    background: #2D323F !important; border-color: #007ACC !important;
+    color: #FFFFFF !important; transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(0, 122, 204, 0.2) !important;
 }
 
 /* ═══════════════════════════════
-   CHAT E BALÕES
+   FLUXO DE CHAT
 ═══════════════════════════════ */
-[data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 8px 0 !important; }
-[data-testid="stChatMessage"] > div { background: transparent !important; padding: 0 !important; }
+[data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 6px 0 !important; }
+[data-testid="stChatMessage"] > div { background: transparent !important; }
 
-/* Balão do assistente (Robô) */
+/* Balão do Técnico (Assistente) */
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stMarkdownContainer"] {
-    background: #1C2030 !important; border-radius: 4px 14px 14px 14px !important;
-    padding: 14px 18px !important; border: 1px solid #252B3B !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    background: #232732 !important; border-radius: 4px 12px 12px 12px !important;
+    padding: 14px 18px !important; border: 1px solid #2F3545 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-/* Balão do usuário */
+/* Balão do Usuário */
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stMarkdownContainer"] {
-    background: linear-gradient(135deg, #1A5C3F, #1E7A52) !important;
-    border-radius: 14px 4px 14px 14px !important; padding: 14px 18px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    background: linear-gradient(135deg, #1A6B4A, #1E8A5E) !important;
+    border-radius: 12px 4px 12px 12px !important; padding: 12px 16px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 [data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li {
-    color: #DEE5F2 !important; font-size: .95rem !important; line-height: 1.6 !important; margin: 0 !important;
+    color: #E2E8F0 !important; font-size: .95rem !important; line-height: 1.6 !important; margin: 0 !important;
 }
 [data-testid="stChatMessage"] strong { color: #FFFFFF !important; font-weight: 600; }
-[data-testid="stChatMessage"] code { background: #12151C !important; color: #FFD269 !important; padding: 3px 6px !important; border-radius: 4px !important; }
-
-/* Avatar customizado fix */
-[data-testid="chatAvatarIcon-assistant"], [data-testid="chatAvatarIcon-user"] {
-    background-color: #252B3B !important;
-}
+[data-testid="stChatMessage"] code { background: #1A1D24 !important; color: #FFCC00 !important; padding: 2px 6px !important; border-radius: 4px !important; }
 
 /* ═══════════════════════════════
-   INPUT DE TEXTO INFERIOR
+   CAIXA DE ENTRADA (CHAT INPUT)
 ═══════════════════════════════ */
-[data-testid="stBottom"] { background: #12151C !important; border-top: 1px solid #1C2030 !important; padding-bottom: 20px !important; }
-[data-testid="stChatInput"] { background: #1C2030 !important; border: 1.5px solid #252B3B !important; border-radius: 12px !important; padding: 4px !important; }
-[data-testid="stChatInput"]:focus-within { border-color: #3B4766 !important; box-shadow: 0 0 0 3px rgba(59,71,102,.2) !important; }
-[data-testid="stChatInput"] > div { background: #1C2030 !important; }
-[data-testid="stChatInput"] textarea { color: #DEE5F2 !important; background: #1C2030 !important; caret-color: #4A7AC8 !important; font-size: 0.95rem !important; }
-[data-testid="stChatInput"] textarea::placeholder { color: #5A6478 !important; }
-
-/* Painel expander de Admin */
-[data-testid="stExpander"] { background: #1C2030 !important; border: 1px solid #252B3B !important; border-radius: 12px !important; margin-bottom: 10px !important; }
-[data-testid="stExpander"] * { color: #D8E0F0 !important; }
+[data-testid="stBottom"] { background: #1A1D24 !important; border-top: 1px solid #2F3545 !important; }
+[data-testid="stChatInput"] { background: #232732 !important; border: 1.5px solid #2F3545 !important; border-radius: 10px !important; }
+[data-testid="stChatInput"]:focus-within { border-color: #007ACC !important; box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.15) !important; }
+[data-testid="stChatInput"] > div { background: #232732 !important; }
+[data-testid="stChatInput"] textarea { color: #E2E8F0 !important; background: #232732 !important; caret-color: #007ACC !important; }
+[data-testid="stChatInput"] textarea::placeholder { color: #6E7B91 !important; }
 </style>
 """
 
@@ -276,7 +285,7 @@ def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
     return full
 
 # ══════════════════════════════════════════════════════════════════════════════
-st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="wide")
+st.set_page_config(page_title="Técnico em Manutenção", page_icon="🔧", layout="wide")
 st.markdown(CSS, unsafe_allow_html=True)
 
 if not GROQ_API_KEY:
@@ -289,17 +298,17 @@ if "messages"     not in st.session_state: st.session_state.messages     = [{"ro
 if "quick_prompt" not in st.session_state: st.session_state.quick_prompt = ""
 
 # ══════════════════════════════════════════════════════════════════════════════
-# LAYOUT DE COLUNAS EQUILIBRADO
+# LAYOUT DA TELA
 # ══════════════════════════════════════════════════════════════════════════════
 col_L, col_R = st.columns([1, 3.2], gap="medium")
 
 # ─────────────────────────────────────────────────
-# PAINEL ESQUERDO
+# PAINEL ESQUERDO (MENU INTERATIVO)
 # ─────────────────────────────────────────────────
 with col_L:
     st.markdown('<div class="left-col">', unsafe_allow_html=True)
 
-    # Foto / Upload
+    # Anexar Foto
     st.markdown('<div class="sec-title">RECURSOS ADICIONAIS</div>', unsafe_allow_html=True)
     st.markdown('<div class="upload-label">ANEXAR FOTO <span>(opcional)</span></div>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader("foto", type=["jpg","jpeg","png","webp"],
@@ -308,23 +317,27 @@ with col_L:
         st.image(uploaded_file, use_container_width=True)
         st.caption("✅ Será enviada com a próxima mensagem")
 
-    # Expertise — Ajustada com ícones limpos
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Áreas de Expertise transformadas em Seletores tipo Aba Dinâmica (Visual do Mockup)
     st.markdown('<div class="sec-title">ÁREAS DE EXPERTISE</div>', unsafe_allow_html=True)
-    for icon, label in [
-        ("🔧", "Hidráulica Industrial"),
-        ("⚡", "Elétrica Industrial"),
-        ("🔌", "Eletrônica / VFD"),
-        ("⚙️", "Eletromecânica / CNC"),
-        ("🔩", "Mecânica Industrial"),
-        ("🤖", "Automação / CLP"),
-        ("🌐", "Redes Industriais"),
-    ]:
-        st.markdown(f'<div class="exp-item"><span class="ei">{icon}</span>{label}</div>',
-                    unsafe_allow_html=True)
+    area_tecnica = st.radio(
+        "Areas",
+        [
+            "💧 Hidráulica Industrial",
+            "⚡ Elétrica Industrial",
+            "🔌 Eletrônica / VFD",
+            "⚙️ Eletromecânica / CNC",
+            "🔩 Mecânica Industrial",
+            "🤖 Automação / CLP",
+            "🌐 Redes Industriais"
+        ],
+        key="area_ativa"
+    )
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Admin
+    # Botão de Nova Conversa & Painel Oculto Admin
     if not st.session_state.get("admin_logged"):
         with st.expander("🔐 Admin", expanded=False):
             pwd = st.text_input("Senha", type="password", label_visibility="collapsed",
@@ -335,40 +348,43 @@ with col_L:
                 else: st.error("Senha incorreta")
     else:
         st.success("✅ Admin Ativo")
-        if st.button("Sair", use_container_width=True, key="btn_sair"):
+        if st.button("Sair do Admin", use_container_width=True, key="btn_sair"):
             st.session_state.admin_logged = False; st.rerun()
 
     if st.button("🗑️ Nova Conversa", use_container_width=True, key="btn_nova"):
         st.session_state.messages = [{"role":"assistant","content":WELCOME_MSG}]
         st.session_state.quick_prompt = ""; st.rerun()
 
-    # Status
+    # Status do Sistema Operacional
     st.markdown(f"""
     <div class="status-pill">
         <div class="s-label">Sistema Operacional</div>
-        <div class="s-val">● Online <span style="color:#5A6478; font-weight:normal; margin-left:4px;">({kb_count} frags)</span></div>
+        <div class="s-val">● Online · {kb_count} fragmentos</div>
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────
-# COLUNA DIREITA (Área principal do Chat)
+# COLUNA DIREITA (CONTEÚDO DO CHAT)
 # ─────────────────────────────────────────────────
 with col_R:
 
-    # Header customizado limpo
+    # Banner do Cabeçalho Atualizado (Nome: Técnico em Manutenção)
     st.markdown("""
     <div class="app-header">
-        <h1>🛠️ Técnico Especialista em Manutenção Industrial</h1>
-        <p class="sub">🧑‍🔧 Mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
+      <div class="icon-box">⚙️</div>
+      <div>
+        <h1>🛠️ Técnico em Manutenção</h1>
+        <p class="sub">🏆 Mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
+      </div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Botões de ação rápida com ícones injetados
+    # Botões de ação rápida integrados ao CSS moderno
     b1, b2, b3 = st.columns(3)
     with b1:
-        if st.button("🔧 Diagnosticar Falha", use_container_width=True, key="q1"):
+        if st.button("⚙️ Diagnosticar Falha", use_container_width=True, key="q1"):
             st.session_state.quick_prompt = "Preciso diagnosticar uma falha no equipamento. Me faça as perguntas necessárias para identificar o problema."; st.rerun()
     with b2:
         if st.button("🔍 Identificar Componente", use_container_width=True, key="q2"):
@@ -377,7 +393,7 @@ with col_R:
         if st.button("📋 Consultar Esquema", use_container_width=True, key="q3"):
             st.session_state.quick_prompt = "Preciso de ajuda para interpretar ou montar um esquema hidráulico ou elétrico."; st.rerun()
 
-    # Base de conhecimento Admin (Painel de Uploads)
+    # Painel da Base de Conhecimento Administrativo
     if st.session_state.get("admin_logged") and sb:
         with st.expander("📚 BASE DE CONHECIMENTO", expanded=False):
             tab1, tab2, tab3, tab4 = st.tabs(["📄 PDF","✍️ Texto","🎥 YouTube","🗂️ Gerenciar"])
@@ -425,7 +441,7 @@ with col_R:
                             if st.button("🗑️", key=f"del_{title}"): delete_doc(title,sb); st.rerun()
                         st.divider()
 
-    # Renderização do histórico de mensagens
+    # Mensagens de histórico do Chat
     for msg in st.session_state.messages:
         avatar = "🔧" if msg["role"] == "assistant" else "👤"
         with st.chat_message(msg["role"], avatar=avatar):
@@ -433,7 +449,7 @@ with col_R:
             if msg.get("image_bytes"):
                 st.image(PIL.Image.open(io.BytesIO(msg["image_bytes"])), width=300)
 
-    # Execução das ações rápidas (prompts dos botões)
+    # Processamento de gatilho de Ação Rápida
     if st.session_state.quick_prompt:
         qp = st.session_state.quick_prompt
         st.session_state.quick_prompt = ""
@@ -442,7 +458,7 @@ with col_R:
         full = do_chat(qp, None, None, sb, kb_count)
         if full: st.session_state.messages.append({"role":"assistant","content":full})
 
-# ── Input de texto principal ──────────────────────────────────────────────────
+# ── Caixa de Chat Entrada (Chat Input) ────────────────────────────────────────
 if prompt := st.chat_input("Digite sua pergunta ou anexe uma foto..."):
     uf = st.session_state.get("foto_up")
     img_b, mime, sfx = None, None, ""
