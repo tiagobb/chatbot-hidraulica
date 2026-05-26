@@ -7,11 +7,11 @@ import io
 import os
 
 # ══════════════════════════════════════════════════════════════════════════════
-# CONFIGURAÇÕES INICIAIS DA PÁGINA (Deve ser o primeiro comando Streamlit)
+# CONFIGURAÇÕES INICIAIS (Obrigatório ser o primeiro comando Streamlit)
 # ══════════════════════════════════════════════════════════════════════════════
 st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="wide")
 
-# Varíaveis de Ambiente e Constantes
+# Variáveis de Ambiente e Constantes
 SUPABASE_URL   = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY   = os.environ.get("SUPABASE_KEY", "")
 GROQ_API_KEY   = os.environ.get("GROQ_API_KEY", "")
@@ -37,7 +37,7 @@ Responda sempre em português do Brasil."""
 WELCOME_MSG = "Olá! Sou seu assistente técnico experiente. Estou aqui para diagnosticar problemas e sugerir soluções rápidas para seu equipamento. Como posso ajudar?"
 
 # ══════════════════════════════════════════════════════════════════════════════
-# CSS CUSTOMIZADO (Lado a Lado Estável)
+# INTERFACE VISUAL (CSS BLINDADO)
 # ══════════════════════════════════════════════════════════════════════════════
 CSS = """
 <style>
@@ -50,7 +50,7 @@ CSS = """
 .stApp, .main { background: #12151C !important; }
 .block-container { padding: .8rem .8rem 5rem .8rem !important; max-width: 100% !important; }
 
-/* Configuração de Flexbox para as colunas do Streamlit */
+/* Flexbox nativo para colunas Streamlit lado a lado sem quebra */
 [data-testid="stColumns"] {
     display: flex !important;
     flex-direction: row !important;
@@ -59,7 +59,7 @@ CSS = """
     gap: 16px !important;
 }
 
-/* Coluna Esquerda Fira */
+/* Coluna da Esquerda (Painel Lateral Fixo) */
 [data-testid="stColumns"] > div:nth-child(1) {
     min-width: 290px !important;
     max-width: 290px !important;
@@ -70,7 +70,7 @@ CSS = """
     padding: 16px 12px !important;
 }
 
-/* Coluna Direita Fluida */
+/* Coluna da Direita (Área Fluida do Chat) */
 [data-testid="stColumns"] > div:nth-child(2) {
     flex: 1 1 auto !important;
     width: 100% !important;
@@ -105,49 +105,4 @@ CSS = """
 .exp-item .ei { font-size: 1rem; min-width: 18px; }
 
 .status-pill {
-    background: #12151C; border: 1px solid #1E2435;
-    border-radius: 8px; padding: 10px 14px; margin-top: 16px;
-}
-.status-pill .s-label { font-size: .6rem; color: #5A6478; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 3px; }
-.status-pill .s-val   { font-size: .82rem; color: #2ECC71; font-weight: 600; }
-
-.app-header {
-    background: linear-gradient(135deg, #1A2035 0%, #1E2845 60%, #1A2035 100%);
-    border-radius: 14px; padding: 20px 24px; margin-bottom: 14px;
-    border: 1px solid #2A3555; box-shadow: 0 6px 24px rgba(0,0,0,.3);
-    display: flex; align-items: center; gap: 18px;
-}
-.icon-box {
-    background: #252B3B; border-radius: 10px;
-    width: 54px; height: 54px; display: flex; align-items: center;
-    justify-content: center; font-size: 1.8rem; flex-shrink: 0;
-    border: 1px solid #363D55;
-}
-.app-header h1 { color: #FFFFFF !important; font-size: 1.35rem; font-weight: 800; margin: 0 0 4px 0 !important; }
-.app-header .sub { color: #7A8BAD !important; font-size: .78rem; margin: 0 !important; }
-
-.stButton > button {
-    background: #1C2030 !important; color: #C8D0E0 !important;
-    border: 1px solid #2D3448 !important; border-radius: 10px !important;
-    font-size: .83rem !important; font-weight: 500 !important;
-    padding: 10px 12px !important; transition: all .2s !important;
-}
-.stButton > button:hover {
-    background: #252B3B !important; border-color: #4A7AC8 !important;
-    color: #FFFFFF !important; transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(74,122,200,.15) !important;
-}
-
-[data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 3px 0 !important; }
-[data-testid="stChatMessage"] > div { background: transparent !important; }
-
-[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stMarkdownContainer"] {
-    background: #1C2030 !important; border-radius: 4px 14px 14px 14px !important;
-    padding: 12px 16px !important; border: 1px solid #252B3B !important;
-}
-[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stMarkdownContainer"] {
-    background: linear-gradient(135deg, #1A6B4A, #1E8A5E) !important;
-    border-radius: 14px 4px 14px 14px !important; padding: 11px 15px !important;
-}
-[data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li {
-    color: #
+    background: #1
