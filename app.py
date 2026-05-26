@@ -54,25 +54,26 @@ CSS = """
 .block-container { padding: 1rem 1rem 5rem 1rem !important; max-width: 100% !important; }
 
 /* ── PAINEL ESQUERDO ── */
-.left-panel {
-    background: #1e293b;
-    border-radius: 14px;
-    border: 1px solid #2d3f55;
-    padding: 16px 14px;
-    min-height: 80vh;
-    position: sticky;
-    top: 1rem;
+[data-testid="stColumn"]:first-child {
+    background: #1e293b !important;
+    border-radius: 14px !important;
+    border: 1px solid #2d3f55 !important;
+    padding: 14px 10px !important;
+}
+[data-testid="stColumn"]:first-child * { color: #e2e8f0 !important; }
+[data-testid="stColumn"]:first-child .stButton > button {
+    background: #0f172a !important; border-color: #334155 !important;
 }
 .panel-section-title {
     font-size: .65rem; font-weight: 700; color: #64748b;
     text-transform: uppercase; letter-spacing: 1.5px;
     padding-bottom: 8px; border-bottom: 1px solid #334155;
-    margin-bottom: 10px;
+    margin-bottom: 10px; margin-top: 4px;
 }
 .exp-item {
     display: flex; align-items: center; gap: 7px;
     padding: 6px 8px; border-radius: 6px; margin-bottom: 3px;
-    background: #0f172a55; border: 1px solid #1e293b44;
+    background: #0f172a55; border: 1px solid #334155;
     font-size: .8rem; color: #cbd5e1;
 }
 .status-box {
@@ -255,8 +256,6 @@ col_left, col_right = st.columns([1, 3], gap="medium")
 # PAINEL ESQUERDO
 # ─────────────────────────────────────────────────
 with col_left:
-    st.markdown('<div class="left-panel">', unsafe_allow_html=True)
-
     # Recursos adicionais
     st.markdown('<div class="panel-section-title">RECURSOS ADICIONAIS</div>', unsafe_allow_html=True)
     st.markdown('<div style="font-size:.76rem;font-weight:600;color:#94a3b8;margin-bottom:5px;">ANEXAR FOTO <span style="font-weight:400;color:#64748b">(opcional)</span></div>', unsafe_allow_html=True)
@@ -308,8 +307,6 @@ with col_left:
         <div style="font-size:.8rem;color:#10b981;font-weight:600;">● Online · {kb_count} fragmentos</div>
     </div>
     """, unsafe_allow_html=True)
-
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────
 # COLUNA DIREITA — CHAT
