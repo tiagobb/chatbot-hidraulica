@@ -334,4 +334,217 @@ def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
             rag = "\n\n---\n**CONHECIMENTO DA BASE:**\n" + "".join(f"\n📚 [{r['title']}]:\n{r['content']}\n" for r in results) + "---\n"
     api = [{"role":"system","content": SYSTEM_PROMPT + rag}]
     for m in st.session_state.messages[:-1]:
-        if m["role"] in ("user","assistant
+        if m["role"] in ("user","assistant"): api.append({"role":m["role"],"content":m["content"]})
+    if image_bytes:
+        b64 = base64.b64encode(image_bytes).decode()
+        api.append({"role":"user","content":[
+            {"type":"text","text":prompt+rag},
+            {"type":"image_url","image_url":{"url":f"data:{mime_type};base64,{b64}"}},
+        ]})
+        model = VISION_MODEL
+    else:
+        api.append({"role":"user","content":prompt})
+        model = TEXT_MODEL
+    with st.chat_message("assistant", avatar="🔧"):
+        if rag: st.caption("📚 Consultando base de conhecimento...")
+        ph = st.empty(); full = ""
+        try:
+            for chunk in stream_groq(api, GROQ_API_KEY, model):
+                full += chunk; ph.markdown(full+"▌")
+            ph.markdown(full)
+        except requests.HTTPError as e:
+            ph.error(f"Erro {e.response.status_code}: {e.response.text[:200]}"); full = ""
+    return full
+
+# ══════════════════════════════════════════════════════════════════════════════
+st.set_page_config(page_title="Técnico em Manutenção", page_icon="🔧", layout="wide")
+st.markdown(CSS, unsafe_allow_html=True)
+
+if not GROQ_API_KEY:
+    st.error("⚠️ GROQ_API_KEY não configurada."); st.stop()
+
+sb       = get_supabase() if SUPABASE_URL and SUPABASE_KEY else None
+kb_count = count_docs(sb) if sb else 0
+
+if "messages"     not in st.session_state: st.session_state.messages     = [{"role":"assistant","content":WELCOME_MSG}]
+if "quick_prompt" not in st.session_state: st.session_state.quick_prompt = ""
+
+# ══════════════════════════════════════════════════════════════════════════════
+# MONTAGEM DA ESTRUTURA RE-ESCALADA
+# ══════════════════════════════════════════════════════════════════════════════
+col_L, col_R = st.columns([1, 3.2], gap="medium")
+
+# ─────────────────────────────────────────────────
+# PAINEL ESQUERDO
+# ─────────────────────────────────────────────────
+with col_L:
+    st.markdown('<div class="left-col">', unsafe_allow_html=True)
+
+    # Box de Imagem
+    st.markdown('<div class="sec-title">RECURSOS ADICIONAIS</div>', unsafe_allow_html=True)
+    st.markdown('<div class="upload-label">ANEXAR FOTO <span>(opcional)</span></div>', unsafe_allow_html=True)
+    uploaded_file = st.file_uploader("foto", type=["jpg","jpeg","png","webp"],
+                                     label_visibility="collapsed", key="foto_up")
+    if uploaded_file:
+        st.image(uploaded_file, use_container_width=True)
+        st.caption("✅ Foto carregada com sucesso!")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Especialidades (Lista Estática Renderizada Corretamente)
+    st.markdown('<div class="sec-title">ÁREAS DE EXPERTISE</div>', unsafe_allow_html=True)
+    for icon, label in [
+        ("💧", "Hidráulica Industrial"),
+        ("⚡", "Elétrica Industrial"),
+        ("🔌", "Eletrônica / VFD"),
+        ("⚙️", "Eletromecânica / CNC"),
+        ("🔩", "Mecânica Industrial"),
+        ("🤖", "Automação / CLP"),
+        ("🌐", "Redes Industriais"),
+    ]:
+        st.markdown(f'<div class="exp-item"><span class="ei">{icon}</span>{label}</div>',
+                    unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Seção Administrativa
+    if not st.session_state.get("admin_logged"):
+        with st.expander("🔐 Admin", expanded=False):
+            pwd = st.text_input("Senha", type="password", label_visibility="collapsed",
+                                placeholder="Senha admin", key="pwd")
+            if st.button("Entrar", use_container_width=True, key="btn_login"):
+                if pwd == ADMIN_PASSWORD:
+                    st.session_state.admin_logged = True; st.rerun()
+                else: st.error("Senha incorreta")
+    else:
+        st.success("✅ Admin Conectado")
+        if st.button("Sair do Admin", use_container_width=True, key="btn_sair"):
+            st.session_state.admin_logged = False; st.rerun()
+
+    if st.button("🗑️ Nova Conversa", use_container_width=True, key="btn_nova"):
+        st.session_state.messages = [{"role":"assistant","content":WELCOME_MSG}]
+        st.session_state.quick_prompt = ""; st.rerun()
+
+    # Rodapé do Painel
+    st.markdown(f"""
+    <div class="status-pill">
+        <div class="s-label">Sistema Operacional</div>
+        <div class="s-val">● Online · {kb_count} fragmentos</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────────
+# PAINEL DIREITO (CHAT)
+# ─────────────────────────────────────────────────
+with col_R:
+
+    # Banner Superior Robusto
+    st.markdown("""
+    <div class="app-header">
+      <div class="icon-box">⚙️</div>
+      <div>
+        <h1>Técnico em Manutenção</h1>
+        <p class="sub">🏆 Especialista com mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
+      </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 3 Botões Principais de Atalhos Rápidos
+    b1, b2, b3 = st.columns(3)
+    with b1:
+        if st.button("🔧 Diagnosticar Falha", use_container_width=True, key="q1"):
+            st.session_state.quick_prompt = "Preciso diagnosticar uma falha no equipamento. Me faça as perguntas necessárias para identificar o problema."; st.rerun()
+    with b2:
+        if st.button("🔍 Identificar Componente", use_container_width=True, key="q2"):
+            st.session_state.quick_prompt = "Preciso identificar um componente hidráulico ou elétrico. Como posso descrevê-lo para você identificar?"; st.rerun()
+    with b3:
+        if st.button("📋 Consultar Esquema", use_container_width=True, key="q3"):
+            st.session_state.quick_prompt = "Preciso de ajuda para interpretar ou montar um esquema hidráulico ou elétrico."; st.rerun()
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Seção RAG (Base de Dados se o admin estiver logado)
+    if st.session_state.get("admin_logged") and sb:
+        with st.expander("📚 BASE DE CONHECIMENTO", expanded=False):
+            tab1, tab2, tab3, tab4 = st.tabs(["📄 PDF","✍️ Texto","🎥 YouTube","🗂️ Gerenciar"])
+            with tab1:
+                pt = st.text_input("Título", placeholder="Ex: Manual Bomba Rexroth A10V", key="pdf_t")
+                pf = st.file_uploader("PDF", type=["pdf"], key="pdf_f")
+                if st.button("📤 Salvar PDF", key="btn_pdf"):
+                    if not pt: st.warning("Digite um título.")
+                    elif not pf: st.warning("Selecione um PDF.")
+                    else:
+                        with st.spinner("Processando..."):
+                            text = extract_pdf(pf.read())
+                            if text.startswith("Erro"): st.error(text)
+                            else: st.success(f"✅ {upload_doc(pt,text,'pdf',pf.name,sb)} fragmentos!"); st.rerun()
+            with tab2:
+                tt = st.text_input("Título", placeholder="Ex: Procedimento Troca de Óleo", key="txt_t")
+                tc = st.text_area("Conteúdo", placeholder="Cole o texto técnico aqui...", height=140, key="txt_c")
+                if st.button("💾 Salvar Texto", key="btn_txt"):
+                    if not tt: st.warning("Título obrigatório.")
+                    elif not tc: st.warning("Conteúdo obrigatório.")
+                    else:
+                        with st.spinner("Salvando..."): st.success(f"✅ {upload_doc(tt,tc,'text','manual',sb)} fragmentos!"); st.rerun()
+            with tab3:
+                yt = st.text_input("Título", placeholder="Ex: Aula Hidráulica Industrial", key="yt_t")
+                yu = st.text_input("URL YouTube", placeholder="https://youtube.com/watch?v=...", key="yt_u")
+                if st.button("📥 Extrair e Salvar", key="btn_yt"):
+                    if not yt: st.warning("Título obrigatório.")
+                    elif not yu: st.warning("URL obrigatória.")
+                    else:
+                        with st.spinner("Extraindo..."):
+                            text, err = get_youtube_transcript(yu)
+                            if err: st.error(f"Erro: {err}")
+                            else: st.success(f"✅ {upload_doc(yt,text,'youtube',yu,sb)} fragmentos!"); st.rerun()
+            with tab4:
+                docs = get_all_docs(sb)
+                if not docs: st.info("Base vazia.")
+                else:
+                    for title in list({d["title"] for d in docs}):
+                        chunks = [d for d in docs if d["title"]==title]
+                        src = chunks[0]["source_type"]
+                        color = {"pdf":"src-pdf","youtube":"src-youtube","text":"src-text"}.get(src,"src-text")
+                        c1,c2 = st.columns([5,1])
+                        with c1: st.markdown(f'<span class="source-tag {color}">{src.upper()}</span> **{title}** <small style="color:#5A6478">({len(chunks)} frag.)</small>', unsafe_allow_html=True)
+                        with c2:
+                            if st.button("🗑️", key=f"del_{title}"): delete_doc(title,sb); st.rerun()
+                        st.divider()
+
+    # Impressão do histórico real
+    for msg in st.session_state.messages:
+        avatar = "🔧" if msg["role"] == "assistant" else "👤"
+        with st.chat_message(msg["role"], avatar=avatar):
+            st.markdown(msg["content"])
+            if msg.get("image_bytes"):
+                st.image(PIL.Image.open(io.BytesIO(msg["image_bytes"])), width=300)
+
+    # Lógica do clique rápido
+    if st.session_state.quick_prompt:
+        qp = st.session_state.quick_prompt
+        st.session_state.quick_prompt = ""
+        with st.chat_message("user", avatar="👤"): st.markdown(qp)
+        st.session_state.messages.append({"role":"user","content":qp})
+        full = do_chat(qp, None, None, sb, kb_count)
+        if full: st.session_state.messages.append({"role":"assistant","content":full})
+
+# ── Input de Digitação Inferior ───────────────────────────────────────────────
+if prompt := st.chat_input("Digite sua pergunta ou anexe uma foto..."):
+    uf = st.session_state.get("foto_up")
+    img_b, mime, sfx = None, None, ""
+    if uf:
+        img_b = uf.read(); mime = uf.type; sfx = f"\n\n📷 *[{uf.name}]*"
+
+    display = prompt + sfx
+    umsg = {"role":"user","content":display}
+    if img_b: umsg["image_bytes"] = img_b
+    st.session_state.messages.append(umsg)
+
+    with col_R:
+        with st.chat_message("user", avatar="👤"):
+            st.markdown(display)
+            if img_b: st.image(PIL.Image.open(io.BytesIO(img_b)), width=300)
+        full = do_chat(prompt, img_b, mime, sb, kb_count)
+        if full: st.session_state.messages.append({"role":"assistant","content":full})
