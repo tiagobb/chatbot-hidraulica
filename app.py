@@ -57,6 +57,10 @@ CSS = """
 [data-testid="stSidebar"] h1,[data-testid="stSidebar"] h2,[data-testid="stSidebar"] h3 { color: #f59e0b !important; }
 [data-testid="stSidebar"] .stButton > button { background:#0f172a !important; border:1px solid #334155 !important; color:#e2e8f0 !important; border-radius:8px !important; font-weight:500 !important; }
 [data-testid="stSidebar"] .stButton > button:hover { background:#334155 !important; border-color:#10b981 !important; }
+/* Botão de abrir/fechar sidebar sempre visível */
+[data-testid="collapsedControl"] { display:flex !important; background:#1e293b !important; border-right:1px solid #334155 !important; }
+[data-testid="collapsedControl"] svg { fill:#e2e8f0 !important; }
+button[kind="header"] { color:#e2e8f0 !important; }
 
 /* ── Header ── */
 .app-header {
@@ -272,7 +276,7 @@ def stream_groq(api_messages, api_key, model):
                         pass
 
 # ── App ────────────────────────────────────────────────────────────────────────
-st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="wide")
+st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="wide", initial_sidebar_state="expanded")
 st.markdown(CSS, unsafe_allow_html=True)
 
 if not GROQ_API_KEY:
