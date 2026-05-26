@@ -168,9 +168,21 @@ CSS = """
 [data-testid="stExpander"] * { color: #E2E8F0 !important; }
 [data-testid="stExpander"] summary p { color: #E2E8F0 !important; }
 
-/* ── RADIO (área de seleção) ── */
-[data-testid="stRadio"] label { color: #CBD5E1 !important; font-size: .84rem !important; }
-[data-testid="stRadio"] { gap: 4px !important; }
+/* ── RADIO (área de seleção) — esconde círculos, vira lista ── */
+[data-testid="stRadio"] > div { gap: 2px !important; }
+[data-testid="stRadio"] label {
+    color: #CBD5E1 !important; font-size: .82rem !important;
+    background: #1A1D2466 !important; border: 1px solid #2F3545 !important;
+    border-radius: 7px !important; padding: 6px 10px !important;
+    cursor: pointer !important; width: 100% !important;
+    transition: all .15s !important;
+}
+[data-testid="stRadio"] label:hover { background: #2D323F !important; border-color: #007ACC !important; color: #60AEFF !important; }
+[data-testid="stRadio"] label[data-selected="true"],
+[data-testid="stRadio"] input:checked + div { background: #007ACC22 !important; border-color: #007ACC !important; color: #60AEFF !important; }
+/* Esconde o círculo do radio */
+[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p { margin: 0 !important; }
+[data-testid="stRadio"] > div > label > div:first-child { display: none !important; }
 
 /* ── SOURCE TAGS ── */
 .source-tag { display:inline-block; padding:2px 8px; border-radius:12px; font-size:.7rem; font-weight:600; }
@@ -332,11 +344,10 @@ col_left, col_right = st.columns([1, 3], gap="medium")
 with col_left:
     # Foto
     st.markdown('<div class="panel-title">📎 Anexar Foto (opcional)</div>', unsafe_allow_html=True)
-    with st.expander("📸 Selecionar / Tirar Foto", expanded=False):
-        uploaded_file = st.file_uploader("foto", type=["jpg","jpeg","png","webp"], label_visibility="collapsed", key="foto_up")
-        if uploaded_file:
-            st.image(uploaded_file, use_container_width=True)
-            st.caption("✅ Será enviada com a próxima mensagem")
+    uploaded_file = st.file_uploader("Selecione ou tire uma foto", type=["jpg","jpeg","png","webp"], key="foto_up")
+    if uploaded_file:
+        st.image(uploaded_file, use_container_width=True)
+        st.caption("✅ Será enviada com a próxima mensagem")
 
     st.markdown("<br>", unsafe_allow_html=True)
 
