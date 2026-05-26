@@ -17,7 +17,7 @@ VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
 GROQ_URL     = "https://api.groq.com/openai/v1/chat/completions"
 
 SYSTEM_PROMPT = """Você é um especialista técnico sênior em manutenção industrial, com mais de 20 anos de experiência nas seguintes áreas:
-- Hidráulica Industrial (circuitos, componentes, óleos, simbologia ISO 1219, servo-hidráulica)
+- Hidráulica Industrial (circuitos, components, óleos, simbologia ISO 1219, servo-hidráulica)
 - Elétrica Industrial (instalações, motores, quadros de comando, NR-10, NBR 5410, NR-12)
 - Eletrônica Industrial (componentes, inversores de frequência VFD, soft-starters, instrumentação)
 - Eletromecânica (servo-motores, freios eletromagnéticos, CNC)
@@ -31,247 +31,227 @@ Responda sempre em português do Brasil."""
 
 WELCOME_MSG = "Olá! Sou seu assistente técnico experiente. Estou aqui para diagnosticar problemas e sugerir soluções rápidas para seu equipamento. Como posso ajudar?"
 
-# ── CSS Corrigido para Escalonamento e Proporções de Tela Reais ────────────────
+# ── CSS Ajustado (Fontes Grandes e Espaçamento Correto) ────────────────────────
 CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* Reset Geral e Fontes Legíveis */
 * { 
     font-family: 'Inter', sans-serif !important; 
-    box-sizing: border-box; 
 }
 
-/* Ocultar Elementos Nativos Invasivos do Streamlit */
+/* Ocultar elementos nativos do Streamlit */
 #MainMenu, footer, header, .stDeployButton { display: none !important; }
 [data-testid="stToolbar"]        { display: none !important; }
 [data-testid="stSidebar"]        { display: none !important; }
 [data-testid="collapsedControl"] { display: none !important; }
 
-/* Configuração do Background Grafite Premium */
+/* Configuração do fundo e container principal */
 .stApp, .main { 
-    background-color: #161920 !important; 
+    background-color: #12151C !important; 
 }
 .block-container { 
-    padding: 1.5rem 2rem 6rem 2rem !important; 
-    max-width: 95% !important; 
+    padding: 20px 30px 80px 30px !important; 
+    max-width: 98% !important; 
 }
 
 /* ═══════════════════════════════
-   PAINEL ESQUERDO (COLUNA TÉCNICA)
+   PAINEL ESQUERDO (COLUNA)
 ═══════════════════════════════ */
 .left-col {
-    background: #1F232E;
+    background: #1C2030;
     border-radius: 12px;
-    border: 1px solid #2D3446;
-    padding: 24px 18px;
-    min-height: 82vh;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border: 1px solid #252B3B;
+    padding: 24px 20px;
+    min-height: 80vh;
 }
 .sec-title {
-    font-size: 0.75rem; 
-    font-weight: 700; 
+    font-size: 13px !important; 
+    font-weight: 700 !important; 
     letter-spacing: 1.5px;
-    color: #7E8B9B; 
+    color: #64748B; 
     text-transform: uppercase;
-    border-bottom: 1px solid #2D3446; 
-    padding-bottom: 10px; 
+    border-bottom: 1px solid #252B3B; 
+    padding-bottom: 8px; 
     margin-bottom: 16px;
-    margin-top: 12px;
+    margin-top: 15px;
 }
 .upload-label {
-    font-size: 0.85rem; 
-    font-weight: 600; 
+    font-size: 14px !important; 
+    font-weight: 600 !important; 
     color: #E2E8F0; 
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 .upload-label span { 
     font-weight: 400; 
-    color: #7E8B9B; 
+    color: #64748B; 
 }
 
-/* Customização do Box de Arrastar Arquivos */
+/* Caixa Dropzone */
 [data-testid="stFileUploader"] { background: transparent !important; border: none !important; }
 [data-testid="stFileDropzone"] {
-    background: #161920 !important; 
-    border: 1.5px dashed #3A4356 !important;
+    background: #12151C !important; 
+    border: 1.5px dashed #334155 !important;
     border-radius: 8px !important; 
-    padding: 16px !important;
+    padding: 20px !important;
 }
-[data-testid="stFileDropzone"] * { color: #A0AEC0 !important; }
+[data-testid="stFileDropzone"] * { color: #94A3B8 !important; font-size: 13px !important; }
 [data-testid="stFileDropzone"] button {
-    background: #2D3446 !important; 
+    background: #252B3B !important; 
     color: #FFFFFF !important;
-    border: 1px solid #3A4356 !important; 
+    border: 1px solid #334155 !important; 
     border-radius: 6px !important;
-    font-size: 0.85rem !important; 
+    font-size: 13px !important; 
     padding: 8px 16px !important;
     width: 100%;
 }
 
-/* Estilização da Lista de Especialidades */
+/* Lista de Especialidades */
 .exp-item {
     display: flex; 
     align-items: center; 
     gap: 12px;
-    padding: 10px 14px; 
+    padding: 12px 16px; 
     border-radius: 8px; 
-    margin-bottom: 6px;
-    background: #161920; 
-    border: 1px solid #2D3446;
-    font-size: 0.9rem; 
-    color: #C2CEDA;
+    margin-bottom: 8px;
+    background: #12151C; 
+    border: 1px solid #252B3B;
+    font-size: 14px !important; 
+    color: #E2E8F0;
+    font-weight: 500;
 }
 .exp-item .ei { 
-    font-size: 1.1rem; 
-    min-width: 22px; 
+    font-size: 18px !important; 
+    min-width: 24px; 
 }
 
-/* Indicador de Status Base */
+/* Status do Sistema */
 .status-pill {
-    background: #161920; 
-    border: 1px solid #2D3446;
+    background: #12151C; 
+    border: 1px solid #252B3B;
     border-radius: 8px; 
     padding: 14px; 
     margin-top: 24px;
 }
 .status-pill .s-label { 
-    font-size: 0.65rem; 
-    color: #7E8B9B; 
+    font-size: 11px !important; 
+    color: #64748B; 
     text-transform: uppercase; 
-    letter-spacing: 1.5px; 
-    margin-bottom: 6px; 
+    letter-spacing: 1px; 
+    margin-bottom: 4px; 
 }
 .status-pill .s-val { 
-    font-size: 0.9rem; 
+    font-size: 14px !important; 
     color: #2ECC71; 
     font-weight: 600; 
 }
 
 /* ═══════════════════════════════
-   HEADER PRINCIPAL DO DIAGNÓSTICO
+   HEADER PRINCIPAL DO CHAT
 ═══════════════════════════════ */
 .app-header {
-    background: linear-gradient(135deg, #1F232E 0%, #161920 100%);
+    background: linear-gradient(135deg, #1C2030 0%, #12151C 100%);
     border-radius: 12px; 
-    padding: 26px 30px; 
-    margin-bottom: 22px;
-    border: 1px solid #2D3446; 
-    border-left: 6px solid #007ACC; /* Destaque azul de óleo industrial */
-    box-shadow: 0 4px 15px rgba(0,0,0,.25);
+    padding: 24px 28px; 
+    margin-bottom: 24px;
+    border: 1px solid #252B3B; 
+    border-left: 6px solid #007ACC; 
+    box-shadow: 0 4px 15px rgba(0,0,0,.3);
     display: flex; 
     align-items: center; 
-    gap: 22px;
+    gap: 20px;
 }
 .icon-box {
-    background: #2D3446; 
+    background: #252B3B; 
     border-radius: 10px;
-    width: 64px; 
-    height: 64px; 
+    width: 60px; 
+    height: 60px; 
     display: flex; 
     align-items: center;
     justify-content: center; 
-    font-size: 2rem; 
+    font-size: 28px !important; 
     flex-shrink: 0;
-    border: 1px solid #3A4356;
+    border: 1px solid #334155;
 }
 .app-header h1 { 
     color: #FFFFFF !important; 
-    font-size: 1.75rem !important; 
+    font-size: 24px !important; 
     font-weight: 700 !important; 
-    margin: 0 0 6px 0 !important; 
-    letter-spacing: 0.5px; 
+    margin: 0 0 4px 0 !important; 
 }
 .app-header .sub { 
-    color: #90A0B2 !important; 
-    font-size: 0.95rem !important; 
+    color: #94A3B8 !important; 
+    font-size: 14px !important; 
     margin: 0 !important; 
 }
 
 /* ═══════════════════════════════
-   BOTÕES DE INTERAÇÃO RÁPIDA
+   BOTÕES DE AÇÃO RÁPIDA
 ═══════════════════════════════ */
 .stButton > button {
-    background: #1F232E !important; 
-    color: #E2E8F0 !important;
-    border: 1px solid #2D3446 !important; 
+    background: #1C2030 !important; 
+    color: #F1F5F9 !important;
+    border: 1px solid #252B3B !important; 
     border-radius: 8px !important;
-    font-size: 0.95rem !important; 
+    font-size: 14px !important; 
     font-weight: 600 !important;
-    padding: 14px 16px !important; 
+    padding: 14px 18px !important; 
     transition: all .2s ease !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 .stButton > button:hover {
-    background: #252A38 !important; 
+    background: #252B3B !important; 
     border-color: #007ACC !important;
     color: #FFFFFF !important; 
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(0, 122, 204, 0.25) !important;
 }
 
 /* ═══════════════════════════════
-   MENSAGENS E HISTÓRICO DO CHAT
+   MENSAGENS DO CHAT
 ═══════════════════════════════ */
 [data-testid="stChatMessage"] { 
     background: transparent !important; 
     border: none !important; 
-    padding: 12px 0 !important; 
+    padding: 14px 0 !important; 
 }
 [data-testid="stChatMessage"] > div { 
     background: transparent !important; 
 }
 
-/* Caixa de Resposta da Inteligência / Técnico */
+/* Balão do Assistente */
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stMarkdownContainer"] {
-    background: #1F232E !important; 
+    background: #1C2030 !important; 
     border-radius: 4px 12px 12px 12px !important;
     padding: 16px 20px !important; 
-    border: 1px solid #2D3446 !important;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    border: 1px solid #252B3B !important;
 }
 
-/* Caixa de Envio do Usuário */
+/* Balão do Usuário */
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stMarkdownContainer"] {
     background: linear-gradient(135deg, #165339, #1E724E) !important;
     border-radius: 12px 4px 12px 12px !important; 
-    padding: 14px 18px !important;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    padding: 16px 20px !important;
 }
 [data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li {
     color: #E2E8F0 !important; 
-    font-size: 1rem !important; 
+    font-size: 15px !important; 
     line-height: 1.6 !important; 
-    margin: 0 !important;
 }
-[data-testid="stChatMessage"] strong { color: #FFFFFF !important; font-weight: 600; }
-[data-testid="stChatMessage"] code { background: #161920 !important; color: #FFCC00 !important; padding: 2px 6px !important; border-radius: 4px !important; }
 
-/* ═══════════════════════════════
-   CAIXA DE DIGITAÇÃO PRINCIPAL
-═══════════════════════════════ */
+/* Campo de Texto Inferior */
 [data-testid="stBottom"] { 
-    background: #161920 !important; 
-    border-top: 1px solid #2D3446 !important; 
-    padding: 15px 0 !important;
+    background: #12151C !important; 
+    border-top: 1px solid #252B3B !important; 
+    padding: 20px 0 !important;
 }
 [data-testid="stChatInput"] { 
-    background: #1F232E !important; 
-    border: 1.5px solid #2D3446 !important; 
+    background: #1C2030 !important; 
+    border: 1.5px solid #252B3B !important; 
     border-radius: 10px !important; 
-    padding: 4px !important;
 }
-[data-testid="stChatInput"]:focus-within { 
-    border-color: #007ACC !important; 
-    box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.2) !important; 
-}
-[data-testid="stChatInput"] > div { background: #1F232E !important; }
 [data-testid="stChatInput"] textarea { 
     color: #FFFFFF !important; 
-    background: #1F232E !important; 
-    font-size: 1rem !important;
+    background: #1C2030 !important; 
+    font-size: 15px !important;
 }
-[data-testid="stChatInput"] textarea::placeholder { color: #7E8B9B !important; }
 </style>
 """
 
@@ -335,4 +315,23 @@ def stream_groq(msgs, key, model):
     b = {"model": model, "messages": msgs, "stream": True, "temperature": 0.7, "max_tokens": 4096}
     with requests.post(GROQ_URL, headers=h, json=b, stream=True, timeout=120) as r:
         r.raise_for_status()
-        for line in r
+        for line in r.iter_lines():
+            if line:
+                d = line.decode("utf-8")
+                if d.startswith("data: "):
+                    s = d[6:].strip()
+                    if s == "[DONE]": break
+                    try:
+                        c = json.loads(s)["choices"][0]["delta"].get("content","")
+                        if c: yield c
+                    except: pass
+
+def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
+    rag = ""
+    if sb and kb_count > 0:
+        results = search_knowledge(prompt, sb)
+        if results:
+            rag = "\n\n---\n**CONHECIMENTO DA BASE:**\n" + "".join(f"\n📚 [{r['title']}]:\n{r['content']}\n" for r in results) + "---\n"
+    api = [{"role":"system","content": SYSTEM_PROMPT + rag}]
+    for m in st.session_state.messages[:-1]:
+        if m["role"] in ("user","assistant
