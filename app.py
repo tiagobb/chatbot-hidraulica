@@ -48,92 +48,112 @@ CSS = """
 * { font-family: 'Inter', sans-serif !important; box-sizing: border-box; }
 #MainMenu, footer, header, .stDeployButton { display: none !important; }
 [data-testid="stToolbar"] { display: none !important; }
-[data-testid="stSidebar"] { display: none !important; }
 .stApp, .main { background-color: #0f172a !important; }
-.block-container { padding: 1.2rem 1.5rem 5rem 1.5rem !important; max-width: 860px !important; margin: 0 auto !important; }
+.block-container { padding: 1.2rem 1.8rem 5rem 1.8rem !important; max-width: 860px !important; }
 
-/* ── Header ── */
+/* ── SIDEBAR ── */
+[data-testid="stSidebar"] {
+    background-color: #1e293b !important;
+    border-right: 1px solid #334155 !important;
+    min-width: 240px !important;
+    max-width: 280px !important;
+}
+[data-testid="stSidebar"] > div:first-child { padding-top: 1rem !important; }
+[data-testid="stSidebar"] * { color: #e2e8f0 !important; }
+[data-testid="stSidebar"] .stButton > button {
+    background: #0f172a !important; color: #e2e8f0 !important;
+    border: 1px solid #334155 !important; border-radius: 8px !important;
+    font-weight: 500 !important; font-size: .83rem !important;
+}
+[data-testid="stSidebar"] .stButton > button:hover { background: #334155 !important; border-color: #10b981 !important; }
+[data-testid="stSidebar"] [data-testid="stFileUploader"] {
+    background: #0f172a !important; border: 1.5px dashed #334155 !important; border-radius: 8px !important;
+}
+[data-testid="stSidebar"] .stTextInput > div > div > input {
+    background: #0f172a !important; color: #e2e8f0 !important; border: 1px solid #334155 !important; border-radius: 8px !important;
+}
+/* Expertise items */
+.exp-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 10px; border-radius: 6px; margin-bottom: 3px;
+    background: #0f172a55; border: 1px solid #1e293b;
+    font-size: .82rem; color: #cbd5e1;
+}
+/* Status bar */
+.status-bar {
+    background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;
+    padding: 10px 12px; margin-top: 1rem;
+}
+
+/* ── HEADER ── */
 .app-header {
     background: linear-gradient(135deg, #0f2d5e 0%, #1e40af 60%, #1e3a5f 100%);
-    border-radius: 16px; padding: 22px 26px 18px; margin-bottom: 12px;
-    border: 1px solid #2563eb44; box-shadow: 0 8px 32px rgba(37,99,235,.2);
+    border-radius: 14px; padding: 20px 24px 16px; margin-bottom: 12px;
+    border: 1px solid #2563eb44; box-shadow: 0 8px 28px rgba(37,99,235,.2);
+    display: flex; align-items: center; gap: 16px;
 }
-.app-header h1 { color:#fff; font-size:1.5rem; font-weight:800; margin:0 0 4px 0; }
-.app-header .subtitle { color:#93c5fd; font-size:.8rem; margin:0 0 14px 0; }
-.expertise-tags { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
-.etag { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); color:#e2e8f0; font-size:.72rem; padding:3px 10px; border-radius:20px; }
-.quick-btns { display:flex; gap:8px; flex-wrap:wrap; }
+.app-header-icon { font-size: 2.4rem; }
+.app-header-text h1 { color: #fff; font-size: 1.4rem; font-weight: 800; margin: 0 0 3px 0; }
+.app-header-text .subtitle { color: #93c5fd; font-size: .78rem; margin: 0; }
 
-/* ── Toolbar row ── */
-.toolbar { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
-
-/* ── Chat messages ── */
-[data-testid="stChatMessage"] { background:transparent !important; border:none !important; padding:4px 0 !important; margin-bottom:2px !important; }
-[data-testid="stChatMessage"] > div { background:transparent !important; }
+/* ── CHAT MESSAGES ── */
+[data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 4px 0 !important; margin-bottom: 2px !important; }
+[data-testid="stChatMessage"] > div { background: transparent !important; }
 
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stMarkdownContainer"] {
-    background:#1e293b !important; border-radius:4px 16px 16px 16px !important;
-    padding:12px 16px !important; border:1px solid #334155 !important;
+    background: #1e293b !important; border-radius: 4px 14px 14px 14px !important;
+    padding: 12px 16px !important; border: 1px solid #334155 !important;
 }
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stMarkdownContainer"] {
-    background:linear-gradient(135deg,#0369a1,#0891b2) !important;
-    border-radius:16px 4px 16px 16px !important; padding:11px 15px !important;
+    background: linear-gradient(135deg, #0369a1, #0891b2) !important;
+    border-radius: 14px 4px 14px 14px !important; padding: 11px 15px !important;
 }
-[data-testid="stChatMessage"] p,
-[data-testid="stChatMessage"] li { color:#e2e8f0 !important; font-size:.9rem !important; line-height:1.65 !important; margin:0 !important; }
-[data-testid="stChatMessage"] strong { color:#f1f5f9 !important; }
-[data-testid="stChatMessage"] code { background:#0f172a !important; color:#fbbf24 !important; padding:2px 6px !important; border-radius:4px !important; }
+[data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li { color: #e2e8f0 !important; font-size: .9rem !important; line-height: 1.65 !important; margin: 0 !important; }
+[data-testid="stChatMessage"] strong { color: #f1f5f9 !important; }
+[data-testid="stChatMessage"] code { background: #0f172a !important; color: #fbbf24 !important; padding: 2px 6px !important; border-radius: 4px !important; }
 
-/* ── Input ── */
-[data-testid="stBottom"] { background:#0f172a !important; border-top:1px solid #1e293b !important; }
-[data-testid="stChatInput"] { background:#1e293b !important; border:1.5px solid #334155 !important; border-radius:12px !important; }
-[data-testid="stChatInput"]:focus-within { border-color:#10b981 !important; box-shadow:0 0 0 3px rgba(16,185,129,.12) !important; }
-[data-testid="stChatInput"] > div { background:#1e293b !important; }
-[data-testid="stChatInput"] textarea { color:#e2e8f0 !important; background:#1e293b !important; caret-color:#10b981 !important; }
-[data-testid="stChatInput"] textarea::placeholder { color:#64748b !important; }
+/* ── INPUT ── */
+[data-testid="stBottom"] { background: #0f172a !important; border-top: 1px solid #1e293b !important; }
+[data-testid="stChatInput"] { background: #1e293b !important; border: 1.5px solid #334155 !important; border-radius: 12px !important; }
+[data-testid="stChatInput"]:focus-within { border-color: #10b981 !important; box-shadow: 0 0 0 3px rgba(16,185,129,.12) !important; }
+[data-testid="stChatInput"] > div { background: #1e293b !important; }
+[data-testid="stChatInput"] textarea { color: #e2e8f0 !important; background: #1e293b !important; caret-color: #10b981 !important; }
+[data-testid="stChatInput"] textarea::placeholder { color: #64748b !important; }
 
-/* ── Buttons ── */
+/* ── BUTTONS ── */
 .stButton > button {
-    background:#1e293b !important; color:#e2e8f0 !important;
-    border:1px solid #334155 !important; border-radius:8px !important;
-    font-weight:500 !important; transition:all .2s !important;
-    font-size:.85rem !important;
+    background: #1e293b !important; color: #e2e8f0 !important;
+    border: 1px solid #334155 !important; border-radius: 8px !important;
+    font-weight: 500 !important; transition: all .2s !important;
 }
-.stButton > button:hover { background:#334155 !important; border-color:#3b82f6 !important; color:#fff !important; }
+.stButton > button:hover { background: #334155 !important; border-color: #3b82f6 !important; color: #fff !important; }
 
-/* ── Expander ── */
-[data-testid="stExpander"] { background:#1e293b !important; border:1px solid #334155 !important; border-radius:10px !important; }
-[data-testid="stExpander"] summary { color:#e2e8f0 !important; }
-[data-testid="stExpander"] * { color:#e2e8f0 !important; }
-[data-testid="stExpander"] p { color:#e2e8f0 !important; }
+/* ── EXPANDER ── */
+[data-testid="stExpander"] { background: #1e293b !important; border: 1px solid #334155 !important; border-radius: 10px !important; }
+[data-testid="stExpander"] summary { color: #e2e8f0 !important; }
+[data-testid="stExpander"] * { color: #e2e8f0 !important; }
 
-/* ── File uploader ── */
-[data-testid="stFileUploader"] { background:#0f172a !important; border:1.5px dashed #334155 !important; border-radius:10px !important; }
-[data-testid="stFileUploader"] * { color:#94a3b8 !important; }
-[data-testid="stFileUploader"] small { color:#64748b !important; }
+/* ── FORM INPUTS ── */
+.stTextInput > div > div > input, .stTextArea > div > div > textarea {
+    background: #0f172a !important; color: #e2e8f0 !important;
+    border: 1px solid #334155 !important; border-radius: 8px !important;
+}
+[data-testid="stFileUploader"] { background: #0f172a !important; border: 1.5px dashed #334155 !important; border-radius: 10px !important; }
+[data-testid="stFileUploader"] * { color: #94a3b8 !important; }
 
-/* ── Inputs/textareas ── */
-.stTextInput > div > div > input { background:#0f172a !important; color:#e2e8f0 !important; border:1px solid #334155 !important; border-radius:8px !important; }
-.stTextArea > div > div > textarea { background:#0f172a !important; color:#e2e8f0 !important; border:1px solid #334155 !important; border-radius:8px !important; }
-.stSelectbox > div > div { background:#0f172a !important; color:#e2e8f0 !important; }
-
-/* ── Source tags ── */
+/* ── SOURCE TAGS ── */
 .source-tag { display:inline-block; padding:2px 8px; border-radius:12px; font-size:.7rem; font-weight:600; }
 .src-pdf { background:#7f1d1d33; color:#fca5a5; border:1px solid #7f1d1d; }
 .src-youtube { background:#7f1d1d33; color:#f87171; border:1px solid #991b1b; }
 .src-text { background:#14532d33; color:#86efac; border:1px solid #14532d; }
 
-/* ── Alerts ── */
-.stAlert { background:#1e293b !important; border-radius:8px !important; }
-.stSuccess { border-left:3px solid #10b981 !important; }
-.stError { border-left:3px solid #ef4444 !important; }
-.stWarning { border-left:3px solid #f59e0b !important; }
-.stInfo { border-left:3px solid #3b82f6 !important; }
+/* ── ALERTS ── */
+.stAlert { background: #1e293b !important; border-radius: 8px !important; }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width:5px; }
-::-webkit-scrollbar-track { background:#0f172a; }
-::-webkit-scrollbar-thumb { background:#334155; border-radius:3px; }
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #0f172a; }
+::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
 </style>
 """
 
@@ -224,8 +244,13 @@ def stream_groq(api_messages, api_key, model):
                         if content: yield content
                     except: pass
 
-# ── App ────────────────────────────────────────────────────────────────────────
-st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="centered")
+# ══════════════════════════════════════════════════════════════════════════════
+st.set_page_config(
+    page_title="Técnico Especialista em Manutenção",
+    page_icon="🔧",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 st.markdown(CSS, unsafe_allow_html=True)
 
 if not GROQ_API_KEY:
@@ -239,23 +264,94 @@ if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "assistant", "content": WELCOME_MESSAGE}]
 if "quick_prompt" not in st.session_state:
     st.session_state.quick_prompt = ""
-if "show_upload" not in st.session_state:
-    st.session_state.show_upload = False
 
-# ── Header ─────────────────────────────────────────────────────────────────────
-st.markdown(f"""
+# ══════════════════════════════════════════════════════════════════════════════
+# SIDEBAR
+# ══════════════════════════════════════════════════════════════════════════════
+with st.sidebar:
+
+    # ── Recursos adicionais ──
+    st.markdown("""
+    <div style="font-size:.7rem;font-weight:700;color:#64748b;text-transform:uppercase;
+    letter-spacing:1.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #334155;">
+    RECURSOS ADICIONAIS</div>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div style="font-size:.78rem;font-weight:600;color:#94a3b8;margin-bottom:6px;">ANEXAR FOTO <span style="font-weight:400;color:#64748b">(opcional)</span></div>', unsafe_allow_html=True)
+    uploaded_file = st.file_uploader("foto", type=["jpg","jpeg","png","webp"], label_visibility="collapsed")
+    if uploaded_file:
+        st.image(uploaded_file, use_container_width=True)
+        st.caption("✅ Será enviada com a próxima mensagem")
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ── Áreas de expertise ──
+    st.markdown("""
+    <div style="font-size:.7rem;font-weight:700;color:#64748b;text-transform:uppercase;
+    letter-spacing:1.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #334155;">
+    ÁREAS DE EXPERTISE</div>
+    """, unsafe_allow_html=True)
+
+    areas = [
+        ("💧", "Hidráulica Industrial"),
+        ("⚡", "Elétrica Industrial"),
+        ("🔌", "Eletrônica / VFD"),
+        ("⚙️", "Eletromecânica / CNC"),
+        ("🔩", "Mecânica Industrial"),
+        ("🤖", "Automação / CLP"),
+        ("🌐", "Redes Industriais"),
+    ]
+    for icon, label in areas:
+        st.markdown(f'<div class="exp-item">{icon} {label}</div>', unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # ── Admin ──
+    st.markdown("""
+    <div style="font-size:.7rem;font-weight:700;color:#64748b;text-transform:uppercase;
+    letter-spacing:1.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #334155;">
+    🔐 PAINEL ADMIN</div>
+    """, unsafe_allow_html=True)
+
+    if not st.session_state.get("admin_logged"):
+        pwd = st.text_input("Senha", type="password", placeholder="Digite a senha", label_visibility="collapsed")
+        if st.button("Entrar", use_container_width=True):
+            if pwd == ADMIN_PASSWORD:
+                st.session_state.admin_logged = True
+                st.rerun()
+            else:
+                st.error("Senha incorreta")
+    else:
+        st.success("✅ Admin conectado")
+        if st.button("Sair do Admin", use_container_width=True):
+            st.session_state.admin_logged = False
+            st.rerun()
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("🗑️ Nova Conversa", use_container_width=True):
+        st.session_state.messages = [{"role": "assistant", "content": WELCOME_MESSAGE}]
+        st.session_state.quick_prompt = ""
+        st.rerun()
+
+    # ── Status ──
+    st.markdown(f"""
+    <div class="status-bar">
+        <div style="font-size:.68rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;">Sistema Operacional</div>
+        <div style="font-size:.82rem;color:#10b981;font-weight:600;">● Online &nbsp;·&nbsp; {kb_count} fragmentos</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# ══════════════════════════════════════════════════════════════════════════════
+# CONTEÚDO PRINCIPAL
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ── Header ────────────────────────────────────────────────────────────────────
+st.markdown("""
 <div class="app-header">
-  <h1>🔧 Técnico Especialista em Manutenção</h1>
-  <p class="subtitle">🏆 Mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
-  <div class="expertise-tags">
-    <span class="etag">💧 Hidráulica</span>
-    <span class="etag">⚡ Elétrica</span>
-    <span class="etag">🔌 Eletrônica/VFD</span>
-    <span class="etag">⚙️ Eletromecânica</span>
-    <span class="etag">🔩 Mecânica</span>
-    <span class="etag">🤖 Automação/CLP</span>
-    <span class="etag">🌐 Redes Industriais</span>
-    <span class="etag">📚 {kb_count} fragmentos</span>
+  <div class="app-header-icon">🔧</div>
+  <div class="app-header-text">
+    <h1>Técnico Especialista em Manutenção</h1>
+    <p class="subtitle">🏆 Mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -275,59 +371,10 @@ with col3:
         st.session_state.quick_prompt = "Preciso de ajuda para interpretar ou montar um esquema hidráulico ou elétrico."
         st.rerun()
 
-# ── Toolbar: foto / admin / nova conversa ─────────────────────────────────────
-t1, t2, t3 = st.columns([2, 2, 2])
-with t1:
-    if st.button("📷 Anexar Foto", use_container_width=True):
-        st.session_state.show_upload = not st.session_state.show_upload
-        st.rerun()
-with t2:
-    if not st.session_state.get("admin_logged"):
-        if st.button("🔐 Painel Admin", use_container_width=True):
-            st.session_state.show_admin_login = not st.session_state.get("show_admin_login", False)
-            st.rerun()
-    else:
-        if st.button("🔓 Sair do Admin", use_container_width=True):
-            st.session_state.admin_logged = False
-            st.rerun()
-with t3:
-    if st.button("🗑️ Nova Conversa", use_container_width=True):
-        st.session_state.messages = [{"role": "assistant", "content": WELCOME_MESSAGE}]
-        st.session_state.quick_prompt = ""
-        st.session_state.show_upload = False
-        st.rerun()
-
-# ── Área de upload de foto ─────────────────────────────────────────────────────
-uploaded_file = None
-if st.session_state.show_upload:
-    with st.container():
-        st.markdown('<div style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px;margin-bottom:10px;">', unsafe_allow_html=True)
-        st.markdown("**📷 Anexar imagem ao próximo envio**")
-        uploaded_file = st.file_uploader("Selecione ou tire uma foto", type=["jpg","jpeg","png","webp"], label_visibility="collapsed")
-        if uploaded_file:
-            st.image(uploaded_file, width=280)
-            st.success("✅ Imagem pronta — será enviada com sua próxima mensagem")
-        st.markdown('</div>', unsafe_allow_html=True)
-
-# ── Login admin ───────────────────────────────────────────────────────────────
-if st.session_state.get("show_admin_login") and not st.session_state.get("admin_logged"):
-    with st.container():
-        st.markdown('<div style="background:#1e293b;border:1px solid #334155;border-radius:10px;padding:14px;margin-bottom:10px;">', unsafe_allow_html=True)
-        pwd = st.text_input("🔐 Senha do Admin", type="password", placeholder="Digite a senha", key="admin_pwd")
-        if st.button("Entrar", key="btn_login"):
-            if pwd == ADMIN_PASSWORD:
-                st.session_state.admin_logged = True
-                st.session_state.show_admin_login = False
-                st.rerun()
-            else:
-                st.error("Senha incorreta")
-        st.markdown('</div>', unsafe_allow_html=True)
-
-# ── Painel Admin ───────────────────────────────────────────────────────────────
+# ── Admin panel ───────────────────────────────────────────────────────────────
 if st.session_state.get("admin_logged") and sb:
-    st.success("✅ Admin conectado")
     with st.expander("📚 BASE DE CONHECIMENTO — Adicionar / Gerenciar", expanded=True):
-        tab1, tab2, tab3, tab4 = st.tabs(["📄 Upload PDF", "✍️ Texto", "🎥 YouTube", "🗂️ Gerenciar"])
+        tab1, tab2, tab3, tab4 = st.tabs(["📄 Upload PDF","✍️ Texto","🎥 YouTube","🗂️ Gerenciar"])
 
         with tab1:
             st.markdown("**Envie manuais e documentos em PDF**")
@@ -383,9 +430,9 @@ if st.session_state.get("admin_logged") and sb:
                 titles = list({d["title"] for d in docs})
                 for title in titles:
                     chunks = [d for d in docs if d["title"] == title]
-                    src    = chunks[0]["source_type"]
-                    color  = {"pdf":"src-pdf","youtube":"src-youtube","text":"src-text"}.get(src,"src-text")
-                    c1, c2 = st.columns([5, 1])
+                    src = chunks[0]["source_type"]
+                    color = {"pdf":"src-pdf","youtube":"src-youtube","text":"src-text"}.get(src,"src-text")
+                    c1, c2 = st.columns([5,1])
                     with c1:
                         st.markdown(f'<span class="source-tag {color}">{src.upper()}</span> **{title}** <small style="color:#64748b">({len(chunks)} fragmentos)</small>', unsafe_allow_html=True)
                     with c2:
@@ -401,13 +448,13 @@ for msg in st.session_state.messages:
         if msg.get("image_bytes"):
             st.image(PIL.Image.open(io.BytesIO(msg["image_bytes"])), width=320)
 
-# Processa ação rápida
+# Ação rápida
 if st.session_state.quick_prompt:
     qp = st.session_state.quick_prompt
     st.session_state.quick_prompt = ""
     with st.chat_message("user"):
         st.markdown(qp)
-    st.session_state.messages.append({"role": "user", "content": qp})
+    st.session_state.messages.append({"role":"user","content": qp})
 
     rag_context = ""
     if sb and kb_count > 0:
@@ -421,29 +468,26 @@ if st.session_state.quick_prompt:
     api_msgs = [{"role":"system","content": SYSTEM_PROMPT + rag_context}]
     for m in st.session_state.messages[:-1]:
         if m["role"] in ("user","assistant"):
-            api_msgs.append({"role": m["role"], "content": m["content"]})
+            api_msgs.append({"role":m["role"],"content":m["content"]})
     api_msgs.append({"role":"user","content": qp})
 
     with st.chat_message("assistant"):
-        ph = st.empty()
-        full = ""
+        ph = st.empty(); full = ""
         try:
             for chunk in stream_groq(api_msgs, GROQ_API_KEY, TEXT_MODEL):
-                full += chunk
-                ph.markdown(full + "▌")
+                full += chunk; ph.markdown(full + "▌")
             ph.markdown(full)
         except Exception as e:
-            ph.error(str(e)[:200])
-            full = ""
+            ph.error(str(e)[:200]); full = ""
     if full:
         st.session_state.messages.append({"role":"assistant","content": full})
 
-# Input do usuário
+# Input
 if prompt := st.chat_input("Digite sua pergunta ou descreva o problema..."):
     image_bytes, mime_type, display_suffix = None, None, ""
     if uploaded_file:
-        image_bytes = uploaded_file.read()
-        mime_type   = uploaded_file.type
+        image_bytes   = uploaded_file.read()
+        mime_type     = uploaded_file.type
         display_suffix = f"\n\n📷 *[{uploaded_file.name}]*"
 
     display_text = prompt + display_suffix
@@ -456,7 +500,6 @@ if prompt := st.chat_input("Digite sua pergunta ou descreva o problema..."):
         if image_bytes:
             st.image(PIL.Image.open(io.BytesIO(image_bytes)), width=320)
 
-    # RAG
     rag_context = ""
     if sb and kb_count > 0:
         results = search_knowledge(prompt, sb)
@@ -469,7 +512,7 @@ if prompt := st.chat_input("Digite sua pergunta ou descreva o problema..."):
     api_msgs = [{"role":"system","content": SYSTEM_PROMPT + rag_context}]
     for m in st.session_state.messages[:-1]:
         if m["role"] in ("user","assistant"):
-            api_msgs.append({"role": m["role"], "content": m["content"]})
+            api_msgs.append({"role":m["role"],"content":m["content"]})
 
     if image_bytes:
         b64 = base64.b64encode(image_bytes).decode()
@@ -484,16 +527,13 @@ if prompt := st.chat_input("Digite sua pergunta ou descreva o problema..."):
 
     with st.chat_message("assistant"):
         if rag_context: st.caption("📚 Consultando base de conhecimento...")
-        ph = st.empty()
-        full = ""
+        ph = st.empty(); full = ""
         try:
             for chunk in stream_groq(api_msgs, GROQ_API_KEY, model):
-                full += chunk
-                ph.markdown(full + "▌")
+                full += chunk; ph.markdown(full + "▌")
             ph.markdown(full)
         except requests.HTTPError as e:
-            ph.error(f"Erro {e.response.status_code}: {e.response.text[:200]}")
-            full = ""
+            ph.error(f"Erro {e.response.status_code}: {e.response.text[:200]}"); full = ""
 
     if full:
         st.session_state.messages.append({"role":"assistant","content": full})
