@@ -17,6 +17,7 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
 TEXT_MODEL   = "llama-3.3-70b-versatile"
 VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
 GROQ_URL     = "https://api.groq.com/openai/v1/chat/completions"
+AI_LABEL     = "Llama 3.3 70B · via Groq"
 
 # Foto do avatar do técnico (troque o número 0-99 para escolher outro rosto)
 TECH_AVATAR = "https://randomuser.me/api/portraits/men/75.jpg"
@@ -123,6 +124,7 @@ section[data-testid="stSidebar"][aria-expanded="false"] {
 }
 .status-pill .s-label { font-size: .68rem; color: #8A96AD; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
 .status-pill .s-val   { font-size: .92rem; color: #2ECC71; font-weight: 600; }
+.status-pill .s-ai    { font-size: .78rem; color: #8A9BC0; margin-top: 7px; padding-top: 7px; border-top: 1px solid rgba(255,255,255,.06); }
 
 /* ═══════════════════════════════
    HEADER PRINCIPAL
@@ -448,6 +450,7 @@ with st.sidebar:
     <div class="status-pill">
         <div class="s-label">Sistema Operacional</div>
         <div class="s-val">● Online · {kb_count} fragmentos</div>
+        <div class="s-ai">🧠 IA: {AI_LABEL}</div>
     </div>
     """, unsafe_allow_html=True)
 
