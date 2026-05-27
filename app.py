@@ -5,6 +5,8 @@ import base64
 import PIL.Image
 import io
 import os
+import re
+import hashlib
 
 # ── Configurações ─────────────────────────────────────────────────────────────
 SUPABASE_URL   = os.environ.get("SUPABASE_URL", "")
@@ -268,6 +270,11 @@ def get_youtube_transcript(url):
         return " ".join(x["text"] for x in t), None
     except Exception as e: return None, str(e)
 
+def find_youtube_url(text):
+    if not text: return None
+    m = re.search(r'https?://[^\s]*(?:youtube\.com/watch\?[^\s]*v=|youtu\.be/)[^\s]+', text)
+    return m.group(0) if m else None
+
 def search_knowledge(q, sb):
     try: return sb.rpc("buscar_conhecimento", {"consulta": q, "max_resultados": 4}).execute().data or []
     except: return []
@@ -306,27 +313,51 @@ def stream_groq(msgs, key, model):
                         if c: yield c
                     except: pass
 
+def transcribe_audio(audio_bytes, key):
+    try:
+        h = {"Authorization": f"Bearer {key}"}
+        files = {"file": ("fala.wav", audio_bytes, "audio/wav")}
+        data = {"model": "whisper-large-v3-turbo", "language": "pt"}
+        r = requests.post("https://api.groq.com/openai/v1/audio/transcriptions",
+                          headers=h, files=files, data=data, timeout=60)
+        r.raise_for_status()
+        return r.json().get("text", "").strip(), None
+    except Exception as e:
+        return None, str(e)
+
 def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
     rag = ""
     if sb and kb_count > 0:
         results = search_knowledge(prompt, sb)
         if results:
             rag = "\n\n---\n**CONHECIMENTO DA BASE:**\n" + "".join(f"\n📚 [{r['title']}]:\n{r['content']}\n" for r in results) + "---\n"
+    # YouTube: se houver link na pergunta, lê a transcrição e usa como contexto
+    yt_context, yt_note = "", ""
+    yt_url = find_youtube_url(prompt)
+    if yt_url:
+        transcript, err = get_youtube_transcript(yt_url)
+        if transcript:
+            yt_context = ("\n\n---\n**TRANSCRIÇÃO DO VÍDEO DO YOUTUBE (conteúdo falado — "
+                          "analise tecnicamente e responda com base nisto):**\n" + transcript[:15000] + "\n---\n")
+            yt_note = "🎥 Li a transcrição do vídeo do YouTube e estou analisando..."
+        else:
+            yt_note = f"⚠️ Não consegui ler a transcrição do vídeo (pode não ter legendas disponíveis). Detalhe: {err}"
     api = [{"role":"system","content": SYSTEM_PROMPT + rag}]
     for m in st.session_state.messages[:-1]:
         if m["role"] in ("user","assistant"): api.append({"role":m["role"],"content":m["content"]})
     if image_bytes:
         b64 = base64.b64encode(image_bytes).decode()
         api.append({"role":"user","content":[
-            {"type":"text","text":prompt+rag},
+            {"type":"text","text":prompt+rag+yt_context},
             {"type":"image_url","image_url":{"url":f"data:{mime_type};base64,{b64}"}},
         ]})
         model = VISION_MODEL
     else:
-        api.append({"role":"user","content":prompt})
+        api.append({"role":"user","content":prompt+yt_context})
         model = TEXT_MODEL
     with st.chat_message("assistant", avatar=TECH_AVATAR):
         if rag: st.caption("📚 Consultando base de conhecimento...")
+        if yt_note: st.caption(yt_note)
         ph = st.empty(); full = ""
         try:
             for chunk in stream_groq(api, GROQ_API_KEY, model):
@@ -364,6 +395,21 @@ with st.sidebar:
     if uploaded_file:
         st.image(uploaded_file, use_container_width=True)
         st.caption("✅ Será enviada com a próxima mensagem")
+
+    st.markdown('<div class="upload-label" style="margin-top:14px;">PERGUNTAR POR VOZ <span>(grave e solte)</span></div>', unsafe_allow_html=True)
+    audio = st.audio_input("voz", label_visibility="collapsed", key="voice_in")
+    if audio is not None:
+        ab = audio.getvalue()
+        sig = hashlib.md5(ab).hexdigest()
+        if st.session_state.get("last_voice_sig") != sig:
+            st.session_state.last_voice_sig = sig
+            with st.spinner("🎤 Transcrevendo sua fala..."):
+                vtext, verr = transcribe_audio(ab, GROQ_API_KEY)
+            if vtext:
+                st.session_state.quick_prompt = vtext
+                st.rerun()
+            else:
+                st.error(f"Não entendi o áudio: {verr}")
 
     st.markdown('<div class="sec-title" style="margin-top:18px;">ÁREAS DE EXPERTISE</div>', unsafe_allow_html=True)
     for icon, label in [
@@ -500,7 +546,7 @@ with st.container():
         if full: st.session_state.messages.append({"role":"assistant","content":full})
 
 # ── Chat input (com anexo de imagem no próprio campo, igual à imagem) ──────────
-chat = st.chat_input("Digite sua pergunta ou anexe uma foto...",
+chat = st.chat_input("Digite sua pergunta, anexe uma foto ou cole um link do YouTube...",
                      accept_file=True, file_type=["jpg", "jpeg", "png", "webp"])
 if chat:
     prompt = (chat.text or "").strip()
