@@ -190,11 +190,17 @@ section[data-testid="stSidebar"][aria-expanded="false"] {
    INPUT
 ═══════════════════════════════ */
 [data-testid="stBottom"] { background: #12151C !important; border-top: 1px solid #1E2435 !important; }
-[data-testid="stChatInput"] { background: #1C2030 !important; border: 2px solid #3DA177 !important; border-radius: 28px !important; }
+/* Campo claro com TEXTO ESCURO (legível), borda verde arredondada — igual à imagem */
+[data-testid="stChatInput"] { background: #F4F6FA !important; border: 2px solid #3DA177 !important; border-radius: 28px !important; }
 [data-testid="stChatInput"]:focus-within { border-color: #2ECC71 !important; box-shadow: 0 0 0 3px rgba(46,204,113,.14) !important; }
-[data-testid="stChatInput"] > div { background: transparent !important; }
-[data-testid="stChatInput"] textarea { color: #D8E0F0 !important; background: transparent !important; caret-color: #2ECC71 !important; font-size: 1rem !important; }
-[data-testid="stChatInput"] textarea::placeholder { color: #6A7589 !important; }
+[data-testid="stChatInput"] > div,
+[data-testid="stChatInput"] [data-baseweb="textarea"],
+[data-testid="stChatInput"] [data-baseweb="base-input"] { background: #F4F6FA !important; }
+[data-testid="stChatInput"] textarea {
+    color: #1A1E28 !important; -webkit-text-fill-color: #1A1E28 !important;
+    background: #F4F6FA !important; caret-color: #1A6B4A !important; font-size: 1rem !important;
+}
+[data-testid="stChatInput"] textarea::placeholder { color: #6A7589 !important; -webkit-text-fill-color: #6A7589 !important; }
 /* Botão de enviar VERDE (igual à imagem) */
 [data-testid="stChatInputSubmitButton"] {
     background: linear-gradient(135deg, #1A6B4A, #1E8A5E) !important;
