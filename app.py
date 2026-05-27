@@ -52,123 +52,127 @@ span[class*="material"] {
     font-family: 'Material Symbols Rounded','Material Icons' !important;
 }
 
-#MainMenu, footer, header, .stDeployButton { display: none !important; }
-[data-testid="stToolbar"]        { display: none !important; }
-[data-testid="stSidebar"]        { display: none !important; }
-[data-testid="collapsedControl"] { display: none !important; }
+#MainMenu, footer, .stDeployButton { display: none !important; }
+[data-testid="stToolbar"] { display: none !important; }
+header[data-testid="stHeader"] { background: transparent !important; }
 .stApp, .main { background: #12151C !important; }
-.block-container { padding: 1rem 1.2rem 6rem 1.2rem !important; max-width: 1280px !important; }
+.block-container { padding: 1.5rem 2rem 7rem 2rem !important; max-width: 1180px !important; }
+
+/* Botões de abrir/fechar a barra lateral (X e ☰) sempre visíveis */
+[data-testid="stSidebarCollapseButton"] button,
+[data-testid="collapsedControl"] button,
+[data-testid="baseButton-headerNoPadding"] {
+    color: #C8D0E0 !important;
+}
 
 /* ═══════════════════════════════
-   PAINEL ESQUERDO  (1ª coluna que contém o marcador)
+   BARRA LATERAL (abre / fecha)
 ═══════════════════════════════ */
-[data-testid="stColumn"]:has(.left-marker) {
-    background: #1C2030;
-    border-radius: 14px;
-    border: 1px solid #252B3B;
-    padding: 18px 16px !important;
-    align-self: flex-start;
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #2B303C 0%, #20242F 100%) !important;
+    border-right: 1px solid #2D3448 !important;
+    min-width: 310px !important;
 }
-.left-marker { display: none; }
+[data-testid="stSidebar"] [data-testid="stSidebarUserContent"] { padding: 1.4rem 1.1rem !important; }
 
 .sec-title {
-    font-size: .62rem; font-weight: 700; letter-spacing: 2px;
-    color: #5A6478; text-transform: uppercase;
-    border-bottom: 1px solid #252B3B; padding-bottom: 8px;
-    margin: 4px 0 12px 0;
+    font-size: .72rem; font-weight: 700; letter-spacing: 2px;
+    color: #8A96AD; text-transform: uppercase;
+    margin: 20px 0 12px 0;
 }
-.upload-label { font-size: .75rem; font-weight: 600; color: #8A96AD; margin-bottom: 4px; }
-.upload-label span { font-weight: 400; color: #5A6478; }
+.upload-label { font-size: .98rem; font-weight: 700; color: #E6ECF7; margin-bottom: 6px; }
+.upload-label span { font-weight: 400; color: #8A96AD; font-size: .82rem; }
 
 /* File uploader */
 [data-testid="stFileUploader"] { background: transparent !important; }
 [data-testid="stFileUploaderDropzone"], [data-testid="stFileDropzone"] {
-    background: #12151C !important; border: 1.5px dashed #2D3448 !important;
-    border-radius: 8px !important; padding: 10px !important; min-height: auto !important;
+    background: #1A1E28 !important; border: 1.5px dashed #3A435C !important;
+    border-radius: 10px !important; padding: 14px !important; min-height: auto !important;
 }
-[data-testid="stFileUploaderDropzone"] *, [data-testid="stFileDropzone"] * { color: #8A96AD !important; }
+[data-testid="stFileUploaderDropzone"] *, [data-testid="stFileDropzone"] * { color: #9AA6BD !important; }
 [data-testid="stFileUploaderDropzone"] button, [data-testid="stFileDropzone"] button {
-    background: #252B3B !important; color: #C8D0E0 !important;
-    border: 1px solid #363D55 !important; border-radius: 6px !important;
-    font-size: .78rem !important; padding: 5px 14px !important;
+    background: #2E3547 !important; color: #DCE3F0 !important;
+    border: 1px solid #434C66 !important; border-radius: 8px !important;
+    font-size: .9rem !important; font-weight: 600 !important; padding: 8px 18px !important;
 }
 
 /* Lista de expertise */
 .exp-item {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 11px; border-radius: 7px; margin-bottom: 4px;
-    background: #12151C; border: 1px solid #1E2435;
-    font-size: .82rem; color: #C0C8D8;
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 13px; border-radius: 9px; margin-bottom: 6px;
+    background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06);
+    font-size: .96rem; color: #D4DBEA;
 }
-.exp-item .ei { font-size: 1rem; min-width: 18px; text-align: center; }
+.exp-item .ei { font-size: 1.18rem; min-width: 22px; text-align: center; }
 
 /* Status */
 .status-pill {
-    background: #12151C; border: 1px solid #1E2435;
-    border-radius: 8px; padding: 11px 14px; margin-top: 14px;
+    background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06);
+    border-radius: 10px; padding: 13px 15px; margin-top: 16px;
 }
-.status-pill .s-label { font-size: .6rem; color: #5A6478; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 3px; }
-.status-pill .s-val   { font-size: .82rem; color: #2ECC71; font-weight: 600; }
+.status-pill .s-label { font-size: .68rem; color: #8A96AD; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
+.status-pill .s-val   { font-size: .92rem; color: #2ECC71; font-weight: 600; }
 
 /* ═══════════════════════════════
    HEADER PRINCIPAL
 ═══════════════════════════════ */
 .app-header {
     background: linear-gradient(135deg, #1A2035 0%, #1E2845 60%, #1A2035 100%);
-    border-radius: 14px; padding: 20px 24px; margin-bottom: 16px;
-    border: 1px solid #2A3555; box-shadow: 0 6px 24px rgba(0,0,0,.3);
-    display: flex; align-items: center; gap: 18px;
+    border-radius: 18px; padding: 28px 32px; margin-bottom: 20px;
+    border: 1px solid #2A3555; box-shadow: 0 8px 30px rgba(0,0,0,.35);
 }
+.hdr-top { display: flex; align-items: center; gap: 22px; }
 .icon-box {
-    background: #252B3B; border-radius: 10px;
-    width: 54px; height: 54px; display: flex; align-items: center;
-    justify-content: center; font-size: 1.8rem; flex-shrink: 0;
-    border: 1px solid #363D55;
+    background: radial-gradient(circle at 35% 28%, #5A6884, #252B3B 72%);
+    border-radius: 50%;
+    width: 82px; height: 82px; display: flex; align-items: center;
+    justify-content: center; font-size: 2.6rem; flex-shrink: 0;
+    border: 1px solid #4A5268;
+    box-shadow: inset 0 2px 8px rgba(255,255,255,.12), 0 5px 16px rgba(0,0,0,.35);
 }
-.hdr-top { display: flex; align-items: center; gap: 18px; }
-.app-header h1 { color: #FFFFFF !important; font-size: 1.28rem; font-weight: 800; margin: 0 0 4px 0 !important; }
-.app-header .sub { color: #7A8BAD; font-size: .78rem; margin: 0; }
+.app-header h1 { color: #FFFFFF !important; font-size: 1.95rem; font-weight: 800; margin: 0 0 6px 0 !important; line-height: 1.15; }
+.app-header .sub { color: #8A9BC0; font-size: 1.02rem; margin: 0; }
 .app-header .welcome {
-    color: #C8D2E6; font-size: .9rem; line-height: 1.55;
-    margin: 14px 0 0 0; padding-top: 14px; border-top: 1px solid #2A3555;
+    color: #C8D2E6; font-size: 1.1rem; line-height: 1.6;
+    margin: 20px 0 0 0; padding-top: 20px; border-top: 1px solid #2A3555;
 }
 
 /* ═══════════════════════════════
    BOTÕES
 ═══════════════════════════════ */
 .stButton > button {
-    background: #1C2030 !important; color: #C8D0E0 !important;
-    border: 1px solid #2D3448 !important; border-radius: 10px !important;
-    font-size: .83rem !important; font-weight: 500 !important;
-    padding: 10px 12px !important; transition: all .2s !important;
+    background: #1C2030 !important; color: #D4DBEA !important;
+    border: 1px solid #2D3448 !important; border-radius: 12px !important;
+    font-size: 1rem !important; font-weight: 500 !important;
+    padding: 16px 14px !important; transition: all .2s !important;
 }
 .stButton > button:hover {
     background: #252B3B !important; border-color: #4A7AC8 !important;
     color: #FFFFFF !important; transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(74,122,200,.15) !important;
+    box-shadow: 0 4px 14px rgba(74,122,200,.18) !important;
 }
 
 /* ═══════════════════════════════
    CHAT
 ═══════════════════════════════ */
-[data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 3px 0 !important; }
+[data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 5px 0 !important; }
 [data-testid="stChatMessage"] > div { background: transparent !important; }
 /* Avatar redondo (foto) */
 [data-testid="stChatMessage"] img { border-radius: 50% !important; object-fit: cover !important; }
 /* Estilo PADRÃO = bolha do assistente (vale para qualquer tipo de avatar) */
 [data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] {
-    background: #1C2030 !important; border-radius: 4px 14px 14px 14px !important;
-    padding: 12px 16px !important; border: 1px solid #252B3B !important;
+    background: #1C2030 !important; border-radius: 4px 16px 16px 16px !important;
+    padding: 14px 18px !important; border: 1px solid #252B3B !important;
 }
 /* Sobrescreve para a bolha do USUÁRIO (avatar emoji 👤) */
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stMarkdownContainer"],
 [data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) [data-testid="stMarkdownContainer"] {
-    background: linear-gradient(135deg, #1A6B4A, #1E8A5E) !important;
-    border-radius: 14px 4px 14px 14px !important; padding: 11px 15px !important;
+    background: linear-gradient(135deg, #235E72, #2C8094) !important;
+    border-radius: 16px 4px 16px 16px !important; padding: 13px 17px !important;
     border: none !important;
 }
 [data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li {
-    color: #D8E0F0 !important; font-size: .9rem !important; line-height: 1.65 !important; margin: 0 !important;
+    color: #D8E0F0 !important; font-size: .98rem !important; line-height: 1.65 !important; margin: 0 !important;
 }
 [data-testid="stChatMessage"] strong { color: #FFFFFF !important; }
 [data-testid="stChatMessage"] code { background: #12151C !important; color: #FFC857 !important; padding: 2px 5px !important; border-radius: 4px !important; }
@@ -177,19 +181,21 @@ span[class*="material"] {
    INPUT
 ═══════════════════════════════ */
 [data-testid="stBottom"] { background: #12151C !important; border-top: 1px solid #1E2435 !important; }
-[data-testid="stChatInput"] { background: #1C2030 !important; border: 1.5px solid #2D3448 !important; border-radius: 12px !important; }
-[data-testid="stChatInput"]:focus-within { border-color: #4A7AC8 !important; box-shadow: 0 0 0 3px rgba(74,122,200,.12) !important; }
-[data-testid="stChatInput"] > div { background: #1C2030 !important; }
-[data-testid="stChatInput"] textarea { color: #D8E0F0 !important; background: #1C2030 !important; caret-color: #4A7AC8 !important; }
-[data-testid="stChatInput"] textarea::placeholder { color: #5A6478 !important; }
+[data-testid="stChatInput"] { background: #1C2030 !important; border: 2px solid #3DA177 !important; border-radius: 28px !important; }
+[data-testid="stChatInput"]:focus-within { border-color: #2ECC71 !important; box-shadow: 0 0 0 3px rgba(46,204,113,.14) !important; }
+[data-testid="stChatInput"] > div { background: transparent !important; }
+[data-testid="stChatInput"] textarea { color: #D8E0F0 !important; background: transparent !important; caret-color: #2ECC71 !important; font-size: 1rem !important; }
+[data-testid="stChatInput"] textarea::placeholder { color: #6A7589 !important; }
 /* Botão de enviar VERDE (igual à imagem) */
 [data-testid="stChatInputSubmitButton"] {
     background: linear-gradient(135deg, #1A6B4A, #1E8A5E) !important;
-    border-radius: 10px !important; color: #FFFFFF !important;
+    border-radius: 50% !important; color: #FFFFFF !important;
 }
 [data-testid="stChatInputSubmitButton"]:hover { background: #23A06E !important; }
 [data-testid="stChatInput"] button svg { color: #FFFFFF !important; fill: #FFFFFF !important; }
-/* Botão de anexar (clipe) também esverdeado */
+/* Ícones de anexar/áudio também esverdeados */
+[data-testid="stChatInput"] [data-testid="stChatInputFileUploadButton"] svg,
+[data-testid="stChatInput"] [data-testid="stChatInputSubmitButton"] svg { color: #FFFFFF !important; }
 [data-testid="stChatInput"] [data-testid="stChatInputFileUploadButton"] svg { color: #2ECC71 !important; fill: #2ECC71 !important; }
 
 /* ═══════════════════════════════
@@ -316,7 +322,7 @@ def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
     return full
 
 # ══════════════════════════════════════════════════════════════════════════════
-st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="wide")
+st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="wide", initial_sidebar_state="expanded")
 st.markdown(CSS, unsafe_allow_html=True)
 
 if not GROQ_API_KEY:
@@ -329,16 +335,13 @@ if "messages"     not in st.session_state: st.session_state.messages     = []
 if "quick_prompt" not in st.session_state: st.session_state.quick_prompt = ""
 
 # ══════════════════════════════════════════════════════════════════════════════
-# LAYOUT — duas colunas fixas (painel sempre visível)
+# LAYOUT — barra lateral nativa (abre / fecha com o botão X e o ☰)
 # ══════════════════════════════════════════════════════════════════════════════
-col_L, col_R = st.columns([1, 3], gap="medium")
 
 # ─────────────────────────────────────────────────
-# PAINEL ESQUERDO
+# BARRA LATERAL
 # ─────────────────────────────────────────────────
-with col_L:
-    st.markdown('<span class="left-marker"></span>', unsafe_allow_html=True)
-
+with st.sidebar:
     st.markdown('<div class="sec-title">RECURSOS ADICIONAIS</div>', unsafe_allow_html=True)
     st.markdown('<div class="upload-label">ANEXAR FOTO <span>(opcional)</span></div>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader("foto", type=["jpg","jpeg","png","webp"],
@@ -388,9 +391,9 @@ with col_L:
     """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────────
-# COLUNA DIREITA
+# ÁREA PRINCIPAL
 # ─────────────────────────────────────────────────
-with col_R:
+with st.container():
     st.markdown(f"""
     <div class="app-header">
       <div class="hdr-top">
@@ -500,7 +503,7 @@ if chat:
         if img_b: umsg["image_bytes"] = img_b
         st.session_state.messages.append(umsg)
 
-        with col_R:
+        with st.container():
             with st.chat_message("user", avatar=USER_AVATAR):
                 st.markdown(display)
                 if img_b: st.image(PIL.Image.open(io.BytesIO(img_b)), width=300)
