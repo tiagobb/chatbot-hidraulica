@@ -58,22 +58,31 @@ header[data-testid="stHeader"] { background: transparent !important; }
 .stApp, .main { background: #12151C !important; }
 .block-container { padding: 1.5rem 2rem 7rem 2rem !important; max-width: 1180px !important; }
 
-/* Botões de abrir/fechar a barra lateral (X e ☰) sempre visíveis */
-[data-testid="stSidebarCollapseButton"] button,
-[data-testid="collapsedControl"] button,
-[data-testid="baseButton-headerNoPadding"] {
-    color: #C8D0E0 !important;
-}
-
 /* ═══════════════════════════════
-   BARRA LATERAL (abre / fecha)
+   BARRA LATERAL — SEMPRE ABERTA (travada, não fecha)
 ═══════════════════════════════ */
-[data-testid="stSidebar"] {
+section[data-testid="stSidebar"] {
     background: linear-gradient(180deg, #2B303C 0%, #20242F 100%) !important;
     border-right: 1px solid #2D3448 !important;
-    min-width: 310px !important;
+    width: 320px !important;
+    min-width: 320px !important;
+    max-width: 320px !important;
+    transform: none !important;
+    visibility: visible !important;
+    margin-left: 0 !important;
+}
+/* Mesmo quando o Streamlit tenta colapsar, forçamos aberta */
+section[data-testid="stSidebar"][aria-expanded="false"] {
+    transform: none !important;
+    margin-left: 0 !important;
+    width: 320px !important;
+    min-width: 320px !important;
 }
 [data-testid="stSidebar"] [data-testid="stSidebarUserContent"] { padding: 1.4rem 1.1rem !important; }
+/* Esconde o botão X de fechar — a barra fica sempre visível, igual à imagem */
+[data-testid="stSidebarCollapseButton"],
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="collapsedControl"] { display: none !important; }
 
 .sec-title {
     font-size: .72rem; font-weight: 700; letter-spacing: 2px;
@@ -399,8 +408,8 @@ with st.container():
       <div class="hdr-top">
         <div class="icon-box">⚙️</div>
         <div>
-          <h1>🔧 Técnico Especialista em Manutenção Industrial</h1>
-          <p class="sub">🏆 Mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
+          <h1>🛠️ Técnico Especialista em Manutenção Industrial</h1>
+          <p class="sub">👨‍🔧 Mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
         </div>
       </div>
       <p class="welcome">{WELCOME_MSG}</p>
