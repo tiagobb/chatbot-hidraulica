@@ -16,6 +16,10 @@ TEXT_MODEL   = "llama-3.3-70b-versatile"
 VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
 GROQ_URL     = "https://api.groq.com/openai/v1/chat/completions"
 
+# Foto do avatar do técnico (troque o número 0-99 para escolher outro rosto)
+TECH_AVATAR = "https://randomuser.me/api/portraits/men/75.jpg"
+USER_AVATAR = "👤"
+
 SYSTEM_PROMPT = """Você é um especialista técnico sênior em manutenção industrial, com mais de 20 anos de experiência nas seguintes áreas:
 - Hidráulica Industrial (circuitos, componentes, óleos, simbologia ISO 1219, servo-hidráulica)
 - Elétrica Industrial (instalações, motores, quadros de comando, NR-10, NBR 5410, NR-12)
@@ -121,8 +125,13 @@ span[class*="material"] {
     justify-content: center; font-size: 1.8rem; flex-shrink: 0;
     border: 1px solid #363D55;
 }
+.hdr-top { display: flex; align-items: center; gap: 18px; }
 .app-header h1 { color: #FFFFFF !important; font-size: 1.28rem; font-weight: 800; margin: 0 0 4px 0 !important; }
 .app-header .sub { color: #7A8BAD; font-size: .78rem; margin: 0; }
+.app-header .welcome {
+    color: #C8D2E6; font-size: .9rem; line-height: 1.55;
+    margin: 14px 0 0 0; padding-top: 14px; border-top: 1px solid #2A3555;
+}
 
 /* ═══════════════════════════════
    BOTÕES
@@ -144,13 +153,19 @@ span[class*="material"] {
 ═══════════════════════════════ */
 [data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 3px 0 !important; }
 [data-testid="stChatMessage"] > div { background: transparent !important; }
-[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stMarkdownContainer"] {
+/* Avatar redondo (foto) */
+[data-testid="stChatMessage"] img { border-radius: 50% !important; object-fit: cover !important; }
+/* Estilo PADRÃO = bolha do assistente (vale para qualquer tipo de avatar) */
+[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] {
     background: #1C2030 !important; border-radius: 4px 14px 14px 14px !important;
     padding: 12px 16px !important; border: 1px solid #252B3B !important;
 }
-[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stMarkdownContainer"] {
+/* Sobrescreve para a bolha do USUÁRIO (avatar emoji 👤) */
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stMarkdownContainer"],
+[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) [data-testid="stMarkdownContainer"] {
     background: linear-gradient(135deg, #1A6B4A, #1E8A5E) !important;
     border-radius: 14px 4px 14px 14px !important; padding: 11px 15px !important;
+    border: none !important;
 }
 [data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li {
     color: #D8E0F0 !important; font-size: .9rem !important; line-height: 1.65 !important; margin: 0 !important;
@@ -167,6 +182,15 @@ span[class*="material"] {
 [data-testid="stChatInput"] > div { background: #1C2030 !important; }
 [data-testid="stChatInput"] textarea { color: #D8E0F0 !important; background: #1C2030 !important; caret-color: #4A7AC8 !important; }
 [data-testid="stChatInput"] textarea::placeholder { color: #5A6478 !important; }
+/* Botão de enviar VERDE (igual à imagem) */
+[data-testid="stChatInputSubmitButton"] {
+    background: linear-gradient(135deg, #1A6B4A, #1E8A5E) !important;
+    border-radius: 10px !important; color: #FFFFFF !important;
+}
+[data-testid="stChatInputSubmitButton"]:hover { background: #23A06E !important; }
+[data-testid="stChatInput"] button svg { color: #FFFFFF !important; fill: #FFFFFF !important; }
+/* Botão de anexar (clipe) também esverdeado */
+[data-testid="stChatInput"] [data-testid="stChatInputFileUploadButton"] svg { color: #2ECC71 !important; fill: #2ECC71 !important; }
 
 /* ═══════════════════════════════
    FORM / ADMIN
@@ -280,7 +304,7 @@ def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
     else:
         api.append({"role":"user","content":prompt})
         model = TEXT_MODEL
-    with st.chat_message("assistant", avatar="🔧"):
+    with st.chat_message("assistant", avatar=TECH_AVATAR):
         if rag: st.caption("📚 Consultando base de conhecimento...")
         ph = st.empty(); full = ""
         try:
@@ -301,7 +325,7 @@ if not GROQ_API_KEY:
 sb       = get_supabase() if SUPABASE_URL and SUPABASE_KEY else None
 kb_count = count_docs(sb) if sb else 0
 
-if "messages"     not in st.session_state: st.session_state.messages     = [{"role":"assistant","content":WELCOME_MSG}]
+if "messages"     not in st.session_state: st.session_state.messages     = []
 if "quick_prompt" not in st.session_state: st.session_state.quick_prompt = ""
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -353,7 +377,7 @@ with col_L:
             st.session_state.admin_logged = False; st.rerun()
 
     if st.button("🗑️ Nova Conversa", use_container_width=True, key="btn_nova"):
-        st.session_state.messages = [{"role":"assistant","content":WELCOME_MSG}]
+        st.session_state.messages = []
         st.session_state.quick_prompt = ""; st.rerun()
 
     st.markdown(f"""
@@ -367,13 +391,16 @@ with col_L:
 # COLUNA DIREITA
 # ─────────────────────────────────────────────────
 with col_R:
-    st.markdown("""
+    st.markdown(f"""
     <div class="app-header">
-      <div class="icon-box">⚙️</div>
-      <div>
-        <h1>🔧 Técnico Especialista em Manutenção Industrial</h1>
-        <p class="sub">🏆 Mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
+      <div class="hdr-top">
+        <div class="icon-box">⚙️</div>
+        <div>
+          <h1>🔧 Técnico Especialista em Manutenção Industrial</h1>
+          <p class="sub">🏆 Mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
+        </div>
       </div>
+      <p class="welcome">{WELCOME_MSG}</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -439,7 +466,7 @@ with col_R:
 
     # Mensagens do chat
     for msg in st.session_state.messages:
-        avatar = "🔧" if msg["role"] == "assistant" else "👤"
+        avatar = TECH_AVATAR if msg["role"] == "assistant" else USER_AVATAR
         with st.chat_message(msg["role"], avatar=avatar):
             st.markdown(msg["content"])
             if msg.get("image_bytes"):
@@ -449,7 +476,7 @@ with col_R:
     if st.session_state.quick_prompt:
         qp = st.session_state.quick_prompt
         st.session_state.quick_prompt = ""
-        with st.chat_message("user", avatar="👤"): st.markdown(qp)
+        with st.chat_message("user", avatar=USER_AVATAR): st.markdown(qp)
         st.session_state.messages.append({"role":"user","content":qp})
         full = do_chat(qp, None, None, sb, kb_count)
         if full: st.session_state.messages.append({"role":"assistant","content":full})
@@ -474,7 +501,7 @@ if chat:
         st.session_state.messages.append(umsg)
 
         with col_R:
-            with st.chat_message("user", avatar="👤"):
+            with st.chat_message("user", avatar=USER_AVATAR):
                 st.markdown(display)
                 if img_b: st.image(PIL.Image.open(io.BytesIO(img_b)), width=300)
             full = do_chat(prompt, img_b, mime, sb, kb_count)
