@@ -62,7 +62,7 @@ header[data-testid="stHeader"] { background: transparent !important; }
 .block-container { padding: 1.5rem 2rem 7rem 2rem !important; max-width: 1180px !important; }
 
 /* ═══════════════════════════════
-   BARRA LATERAL — SEMPRE ABERTA (travada, não fecha)
+   BARRA LATERAL
 ═══════════════════════════════ */
 section[data-testid="stSidebar"] {
     background: linear-gradient(180deg, #2B303C 0%, #20242F 100%) !important;
@@ -74,18 +74,18 @@ section[data-testid="stSidebar"] {
     visibility: visible !important;
     margin-left: 0 !important;
 }
-/* Mesmo quando o Streamlit tenta colapsar, forçamos aberta */
-section[data-testid="stSidebar"][aria-expanded="false"] {
-    transform: none !important;
-    margin-left: 0 !important;
-    width: 320px !important;
-    min-width: 320px !important;
-}
 [data-testid="stSidebar"] [data-testid="stSidebarUserContent"] { padding: 1.4rem 1.1rem !important; }
-/* Esconde o botão X de fechar — a barra fica sempre visível, igual à imagem */
+/* Esconde o botão X de fechar nativo — usamos o botão toggle próprio */
 [data-testid="stSidebarCollapseButton"],
 [data-testid="stSidebarCollapsedControl"],
 [data-testid="collapsedControl"] { display: none !important; }
+/* Botão toggle da barra lateral — fixo no canto superior esquerdo, estilo discreto */
+.st-key-sidebar_toggle { position: fixed !important; top: 12px; left: 12px; z-index: 1000000; width: auto !important; }
+.st-key-sidebar_toggle button {
+    background: #1C2030 !important; color: #C8D0E0 !important;
+    border: 1px solid #2D3448 !important; border-radius: 8px !important;
+    padding: 4px 11px !important; min-height: 0 !important;
+}
 
 .sec-title {
     font-size: .72rem; font-weight: 700; letter-spacing: 2px;
@@ -384,6 +384,14 @@ kb_count = count_docs(sb) if sb else 0
 
 if "messages"     not in st.session_state: st.session_state.messages     = []
 if "quick_prompt" not in st.session_state: st.session_state.quick_prompt = ""
+if "sidebar_open" not in st.session_state: st.session_state.sidebar_open = True
+
+# Botão toggle (☰ abre / ✕ fecha) controlando a barra lateral via session_state
+if not st.session_state.sidebar_open:
+    st.markdown('<style>section[data-testid="stSidebar"]{display:none !important;}</style>', unsafe_allow_html=True)
+if st.button("✕" if st.session_state.sidebar_open else "☰", key="sidebar_toggle"):
+    st.session_state.sidebar_open = not st.session_state.sidebar_open
+    st.rerun()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # LAYOUT — barra lateral nativa (abre / fecha com o botão X e o ☰)
