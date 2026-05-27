@@ -33,159 +33,188 @@ WELCOME_MSG = "Olá! Sou seu assistente técnico experiente. Estou aqui para dia
 
 CSS = """
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-/* Fonte Inter SOMENTE em elementos de texto — NUNCA em ícones (Material Symbols) */
-* { box-sizing: border-box; }
-html, body, .stApp, button, input, textarea, select,
-p, h1, h2, h3, h4, h5, h6, li, a, label,
-.stMarkdown, [data-testid="stMarkdownContainer"] {
-    font-family: 'Inter', sans-serif !important;
-}
-/* Restaura a fonte dos ícones para não virarem texto cru */
-[data-testid="stIconMaterial"], .material-symbols-rounded, .material-icons,
-span[class*="material"] {
-    font-family: 'Material Symbols Rounded','Material Icons' !important;
-}
-
-#MainMenu, footer, .stDeployButton { display: none !important; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+* { font-family: 'Inter', sans-serif !important; box-sizing: border-box; }
+#MainMenu, footer, header, .stDeployButton { display: none !important; }
 [data-testid="stToolbar"] { display: none !important; }
-.stApp, .main { background: #12151C !important; }
-.block-container { padding: 1rem 1.4rem 5rem 1.4rem !important; max-width: 1100px !important; }
+[data-testid="stSidebar"] { display: none !important; }
+[data-testid="collapsedControl"] { display: none !important; }
 
-/* ═══════════════════════════════
-   BARRA LATERAL
-═══════════════════════════════ */
-[data-testid="stSidebar"] {
-    background: #1C2030 !important;
-    border-right: 1px solid #252B3B !important;
-}
-[data-testid="stSidebar"] > div:first-child { padding-top: 1.2rem; }
-/* Botão de recolher/expandir SEMPRE visível */
-[data-testid="stSidebarCollapseButton"], [data-testid="collapsedControl"] {
-    display: block !important; visibility: visible !important;
+:root{
+    --bg:#07121b;
+    --panel:#101b24;
+    --panel-2:#172430;
+    --line:#344657;
+    --text:#eef6ff;
+    --muted:#b7c4cf;
+    --accent:#54b98c;
+    --blue:#c8ebff;
 }
 
+.stApp, .main {
+    background:
+      radial-gradient(circle at 97% 94%, rgba(220,238,255,.32) 0 18px, transparent 20px),
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px),
+      radial-gradient(circle at 70% 10%, rgba(50,117,151,.22), transparent 28%),
+      #07121b !important;
+    background-size: auto, 52px 52px, 52px 52px, auto, auto !important;
+}
+.block-container { padding: .75rem 1rem 5.2rem .85rem !important; max-width: 1220px !important; }
+
+/* barra lateral visual parecida com o Gemini */
+.left-col {
+    background: linear-gradient(180deg, rgba(125,135,142,.42), rgba(72,80,88,.28));
+    border-right: 1px solid rgba(255,255,255,.18);
+    padding: 14px 10px 18px 10px;
+    min-height: calc(100vh - 1.5rem);
+    box-shadow: inset -10px 0 28px rgba(0,0,0,.25);
+    position: relative;
+}
+.left-col:before{
+    content:'×';
+    position:absolute; top:9px; right:14px;
+    color:#d7dde4; font-size:22px; font-weight:300;
+}
 .sec-title {
-    font-size: .62rem; font-weight: 700; letter-spacing: 2px;
-    color: #5A6478; text-transform: uppercase;
-    border-bottom: 1px solid #252B3B; padding-bottom: 8px;
-    margin: 4px 0 12px 0;
+    font-size: .78rem; font-weight: 800; letter-spacing: .2px;
+    color: #f0f3f6; text-transform: uppercase;
+    margin: 42px 4px 8px 4px;
+    text-shadow: 0 1px 2px rgba(0,0,0,.55);
 }
-.upload-label { font-size: .75rem; font-weight: 600; color: #8A96AD; margin-bottom: 4px; }
-.upload-label span { font-weight: 400; color: #5A6478; }
+.upload-label {
+    display:none;
+}
+[data-testid="stFileUploader"] {
+    background: #eaf1f8 !important;
+    border: 1px solid #b6c5d4 !important;
+    border-radius: 10px !important;
+    padding: 10px 12px !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,.22) !important;
+}
+[data-testid="stFileUploader"]:before{
+    content:'ANEXAR FOTO (opcional)';
+    display:block; color:#1b2430; font-size:.78rem; font-weight:800; margin-bottom:6px;
+}
+[data-testid="stFileDropzone"] {
+    background: #dfe9f3 !important; border: 1px solid #b5c3d1 !important;
+    border-radius: 8px !important; padding: 7px !important;
+}
+[data-testid="stFileDropzone"] * { color: #16202b !important; }
+[data-testid="stFileDropzone"] button {
+    width:100% !important;
+    background: #eef5fc !important; color: #111923 !important;
+    border: 1px solid #b7c6d5 !important; border-radius: 7px !important;
+    font-size: .86rem !important; padding: 6px 10px !important;
+    box-shadow: inset 0 -2px 4px rgba(0,0,0,.06) !important;
+}
+[data-testid="stFileUploader"] small { color:#475563 !important; }
 
-/* File uploader */
-[data-testid="stFileUploader"] { background: transparent !important; }
-[data-testid="stFileUploaderDropzone"], [data-testid="stFileDropzone"] {
-    background: #12151C !important; border: 1.5px dashed #2D3448 !important;
-    border-radius: 8px !important; padding: 10px !important; min-height: auto !important;
-}
-[data-testid="stFileUploaderDropzone"] *, [data-testid="stFileDropzone"] * { color: #8A96AD !important; }
-[data-testid="stFileUploaderDropzone"] button, [data-testid="stFileDropzone"] button {
-    background: #252B3B !important; color: #C8D0E0 !important;
-    border: 1px solid #363D55 !important; border-radius: 6px !important;
-    font-size: .78rem !important; padding: 5px 14px !important;
-}
-
-/* Lista de expertise */
 .exp-item {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 11px; border-radius: 7px; margin-bottom: 4px;
-    background: #12151C; border: 1px solid #1E2435;
-    font-size: .82rem; color: #C0C8D8;
+    display: flex; align-items: center; gap: 7px;
+    padding: 7px 7px; border-radius: 7px; margin: 5px 0;
+    background: rgba(0,0,0,.32); border: 1px solid rgba(255,255,255,.06);
+    font-size: .86rem; color: #ffffff; font-weight: 700;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
 }
-.exp-item .ei { font-size: 1rem; min-width: 18px; text-align: center; }
-
-/* Status */
+.exp-item .ei { font-size: .92rem; min-width: 18px; }
 .status-pill {
-    background: #12151C; border: 1px solid #1E2435;
-    border-radius: 8px; padding: 11px 14px; margin-top: 14px;
+    background: rgba(5,17,28,.78); border: 1px solid rgba(255,255,255,.18);
+    border-radius: 8px; padding: 11px 12px; margin-top: 18px;
+    color:#fff; box-shadow: 0 5px 15px rgba(0,0,0,.22);
 }
-.status-pill .s-label { font-size: .6rem; color: #5A6478; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 3px; }
-.status-pill .s-val   { font-size: .82rem; color: #2ECC71; font-weight: 600; }
+.status-pill .s-label { font-size: .78rem; color: #ffffff; font-weight:700; margin-bottom: 5px; }
+.status-pill .s-val   { font-size: .84rem; color: #54d287; font-weight: 700; }
 
-/* ═══════════════════════════════
-   HEADER PRINCIPAL
-═══════════════════════════════ */
+/* área principal */
+.main-shell{ max-width: 840px; margin: 34px auto 0 auto; position:relative; }
+.hamburger{ position:fixed; right:20px; top:76px; color:#e6edf5; font-size:20px; z-index:5; }
+.app-card {
+    background: rgba(20,31,40,.90);
+    border: 1px solid rgba(190,214,232,.45);
+    border-radius: 8px;
+    box-shadow: 0 12px 35px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.08);
+    overflow: hidden;
+}
 .app-header {
-    background: linear-gradient(135deg, #1A2035 0%, #1E2845 60%, #1A2035 100%);
-    border-radius: 14px; padding: 20px 24px; margin-bottom: 16px;
-    border: 1px solid #2A3555; box-shadow: 0 6px 24px rgba(0,0,0,.3);
-    display: flex; align-items: center; gap: 18px;
+    padding: 18px 22px 14px 22px;
+    border-bottom: 1px solid rgba(255,255,255,.16);
+    display: flex; align-items: center; gap: 16px;
+    background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0));
 }
 .icon-box {
-    background: #252B3B; border-radius: 10px;
-    width: 54px; height: 54px; display: flex; align-items: center;
-    justify-content: center; font-size: 1.8rem; flex-shrink: 0;
-    border: 1px solid #363D55;
+    width: 58px; height: 58px; display: flex; align-items:center; justify-content:center;
+    font-size: 3rem; flex-shrink: 0; filter: drop-shadow(0 4px 4px rgba(0,0,0,.45));
 }
-.app-header h1 { color: #FFFFFF !important; font-size: 1.3rem; font-weight: 800; margin: 0 0 4px 0 !important; }
-.app-header .sub { color: #7A8BAD; font-size: .78rem; margin: 0; }
+.app-header h1 { color:#fff; font-size: 1.62rem; line-height:1.08; font-weight: 900; margin:0 0 5px 0; text-shadow:0 2px 2px rgba(0,0,0,.6); }
+.app-header .sub { color:#cfdae3; font-size:.86rem; margin:0; }
+.intro-text { padding: 15px 22px 10px 22px; color:#ffffff; font-weight:700; font-size:.94rem; line-height:1.55; }
+.quick-row { padding: 0 22px 16px 22px; }
+.quick-row .stButton > button, .stButton > button {
+    background: rgba(15,27,38,.92) !important; color:#fff !important;
+    border: 1px solid #6a8194 !important; border-radius: 8px !important;
+    font-size: .88rem !important; font-weight: 800 !important;
+    padding: 13px 10px !important; transition: all .18s ease !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 3px 10px rgba(0,0,0,.2) !important;
+}
+.stButton > button:hover { border-color:#bfefff !important; transform:translateY(-1px); background:#172b3b !important; }
 
-/* ═══════════════════════════════
-   BOTÕES
-═══════════════════════════════ */
-.stButton > button {
-    background: #1C2030 !important; color: #C8D0E0 !important;
-    border: 1px solid #2D3448 !important; border-radius: 10px !important;
-    font-size: .83rem !important; font-weight: 500 !important;
-    padding: 10px 12px !important; transition: all .2s !important;
-}
-.stButton > button:hover {
-    background: #252B3B !important; border-color: #4A7AC8 !important;
-    color: #FFFFFF !important; transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(74,122,200,.15) !important;
-}
-
-/* ═══════════════════════════════
-   CHAT
-═══════════════════════════════ */
-[data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 3px 0 !important; }
+/* chat */
+.chat-area { max-width: 840px; margin: 16px auto 0 auto; border-bottom:1px solid rgba(255,255,255,.15); padding-bottom:10px; }
+[data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 5px 0 !important; }
 [data-testid="stChatMessage"] > div { background: transparent !important; }
+[data-testid="chatAvatarIcon-assistant"], [data-testid="chatAvatarIcon-user"] { background: transparent !important; }
+[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] {
+    box-shadow: 0 4px 16px rgba(0,0,0,.18);
+}
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stMarkdownContainer"] {
-    background: #1C2030 !important; border-radius: 4px 14px 14px 14px !important;
-    padding: 12px 16px !important; border: 1px solid #252B3B !important;
+    background: linear-gradient(135deg, #303b46, #25313b) !important;
+    border-radius: 4px 15px 15px 15px !important;
+    padding: 12px 16px !important; border: 1px solid rgba(255,255,255,.06) !important;
 }
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stMarkdownContainer"] {
-    background: linear-gradient(135deg, #1A6B4A, #1E8A5E) !important;
-    border-radius: 14px 4px 14px 14px !important; padding: 11px 15px !important;
+    background: #bfe7ff !important; color:#0c1a24 !important;
+    border-radius: 14px 4px 14px 14px !important; padding: 12px 15px !important;
+    border: 1px solid #d9f1ff !important;
 }
-[data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li {
-    color: #D8E0F0 !important; font-size: .9rem !important; line-height: 1.65 !important; margin: 0 !important;
+[data-testid="stChatMessage"] p, [data-testid="stChatMessage"] li { font-size:.9rem !important; line-height:1.55 !important; margin:0 !important; }
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) p { color:#fff !important; font-weight:700 !important; }
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) p { color:#07131c !important; font-weight:500 !important; }
+[data-testid="stChatMessage"] strong { color:#fff !important; }
+[data-testid="stChatMessage"] code { background:#07121b !important; color:#ffd166 !important; padding:2px 5px !important; border-radius:4px !important; }
+
+/* input inferior */
+[data-testid="stBottom"] { background: transparent !important; border-top: none !important; }
+[data-testid="stChatInput"] {
+    max-width: 840px !important; margin: 0 auto 12px auto !important;
+    background: #ffffff !important; border: 2px solid #45bf7d !important; border-radius: 24px !important;
+    box-shadow: 0 8px 28px rgba(0,0,0,.28) !important;
 }
-[data-testid="stChatMessage"] strong { color: #FFFFFF !important; }
-[data-testid="stChatMessage"] code { background: #12151C !important; color: #FFC857 !important; padding: 2px 5px !important; border-radius: 4px !important; }
+[data-testid="stChatInput"] > div { background:#ffffff !important; border-radius:24px !important; }
+[data-testid="stChatInput"] textarea { color:#101820 !important; background:#ffffff !important; caret-color:#1a8d55 !important; }
+[data-testid="stChatInput"] textarea::placeholder { color:#6b7280 !important; }
+[data-testid="stChatInput"] button { background:#41b87a !important; color:#fff !important; border-radius:999px !important; }
 
-/* ═══════════════════════════════
-   INPUT
-═══════════════════════════════ */
-[data-testid="stBottom"] { background: #12151C !important; border-top: 1px solid #1E2435 !important; }
-[data-testid="stChatInput"] { background: #1C2030 !important; border: 1.5px solid #2D3448 !important; border-radius: 12px !important; }
-[data-testid="stChatInput"]:focus-within { border-color: #4A7AC8 !important; box-shadow: 0 0 0 3px rgba(74,122,200,.12) !important; }
-[data-testid="stChatInput"] > div { background: #1C2030 !important; }
-[data-testid="stChatInput"] textarea { color: #D8E0F0 !important; background: #1C2030 !important; caret-color: #4A7AC8 !important; }
-[data-testid="stChatInput"] textarea::placeholder { color: #5A6478 !important; }
-
-/* ═══════════════════════════════
-   FORM / ADMIN
-═══════════════════════════════ */
 .stTextInput > div > div > input, .stTextArea > div > div > textarea {
-    background: #12151C !important; color: #D8E0F0 !important;
-    border: 1px solid #2D3448 !important; border-radius: 8px !important;
+    background: #101b24 !important; color: #eef6ff !important; border: 1px solid #344657 !important; border-radius: 8px !important;
 }
-[data-testid="stExpander"] { background: #1C2030 !important; border: 1px solid #252B3B !important; border-radius: 10px !important; }
-[data-testid="stExpander"] summary p { color: #D8E0F0 !important; }
-.stAlert { background: #12151C !important; border-radius: 8px !important; }
+[data-testid="stExpander"] { background: rgba(16,27,36,.8) !important; border: 1px solid rgba(255,255,255,.14) !important; border-radius: 10px !important; }
+[data-testid="stExpander"] * { color: #eef6ff !important; }
+.stAlert { background: rgba(16,27,36,.85) !important; border-radius: 8px !important; }
 .source-tag { display:inline-block; padding:2px 8px; border-radius:12px; font-size:.7rem; font-weight:600; }
-.src-pdf     { background:#7f1d1d33; color:#fca5a5; border:1px solid #7f1d1d; }
+.src-pdf { background:#7f1d1d33; color:#fca5a5; border:1px solid #7f1d1d; }
 .src-youtube { background:#7f1d1d33; color:#f87171; border:1px solid #991b1b; }
-.src-text    { background:#14532d33; color:#86efac; border:1px solid #14532d; }
-
-/* SCROLLBAR */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: #12151C; }
-::-webkit-scrollbar-thumb { background: #2D3448; border-radius: 2px; }
+.src-text { background:#14532d33; color:#86efac; border:1px solid #14532d; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #07121b; }
+::-webkit-scrollbar-thumb { background: #7e93a8; border-radius: 999px; }
+@media (max-width: 760px){
+    .block-container{padding:.4rem .5rem 5rem .5rem !important;}
+    .left-col{min-height:auto; margin-bottom:12px;}
+    .main-shell{margin-top:0;}
+    .app-header h1{font-size:1.2rem;}
+    .icon-box{width:44px;height:44px;font-size:2.2rem;}
+}
 </style>
 """
 
@@ -291,8 +320,7 @@ def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
     return full
 
 # ══════════════════════════════════════════════════════════════════════════════
-st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧",
-                   layout="centered", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="wide")
 st.markdown(CSS, unsafe_allow_html=True)
 
 if not GROQ_API_KEY:
@@ -305,9 +333,17 @@ if "messages"     not in st.session_state: st.session_state.messages     = [{"ro
 if "quick_prompt" not in st.session_state: st.session_state.quick_prompt = ""
 
 # ══════════════════════════════════════════════════════════════════════════════
-# BARRA LATERAL
+# LAYOUT
 # ══════════════════════════════════════════════════════════════════════════════
-with st.sidebar:
+col_L, col_R = st.columns([1, 3.2], gap="medium")
+
+# ─────────────────────────────────────────────────
+# PAINEL ESQUERDO
+# ─────────────────────────────────────────────────
+with col_L:
+    st.markdown('<div class="left-col">', unsafe_allow_html=True)
+
+    # Foto
     st.markdown('<div class="sec-title">RECURSOS ADICIONAIS</div>', unsafe_allow_html=True)
     st.markdown('<div class="upload-label">ANEXAR FOTO <span>(opcional)</span></div>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader("foto", type=["jpg","jpeg","png","webp"],
@@ -316,22 +352,24 @@ with st.sidebar:
         st.image(uploaded_file, use_container_width=True)
         st.caption("✅ Será enviada com a próxima mensagem")
 
-    st.markdown('<div class="sec-title" style="margin-top:18px;">ÁREAS DE EXPERTISE</div>', unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Expertise — lista estática
+    st.markdown('<div class="sec-title">ÁREAS DE EXPERTISE</div>', unsafe_allow_html=True)
     for icon, label in [
         ("🔧","Hidráulica Industrial"),
         ("⚡","Elétrica Industrial"),
-        ("🔌","Eletrônica / VFD"),
+        ("⚡","Eletrônica / VFD"),
+        ("🔧","Eletrônica / VFD"),
         ("⚙️","Eletromecânica / CNC"),
         ("🔩","Mecânica Industrial"),
-        ("🤖","Automação / CLP"),
-        ("🌐","Redes Industriais"),
     ]:
         st.markdown(f'<div class="exp-item"><span class="ei">{icon}</span>{label}</div>',
                     unsafe_allow_html=True)
 
-    st.markdown('<div style="margin-top:16px;"></div>', unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    # Admin
+    # Admin (oculto por padrão)
     if not st.session_state.get("admin_logged"):
         with st.expander("🔐 Admin", expanded=False):
             pwd = st.text_input("Senha", type="password", label_visibility="collapsed",
@@ -341,7 +379,7 @@ with st.sidebar:
                     st.session_state.admin_logged = True; st.rerun()
                 else: st.error("Senha incorreta")
     else:
-        st.success("✅ Admin conectado")
+        st.success("✅ Admin")
         if st.button("Sair", use_container_width=True, key="btn_sair"):
             st.session_state.admin_logged = False; st.rerun()
 
@@ -349,6 +387,7 @@ with st.sidebar:
         st.session_state.messages = [{"role":"assistant","content":WELCOME_MSG}]
         st.session_state.quick_prompt = ""; st.rerun()
 
+    # Status
     st.markdown(f"""
     <div class="status-pill">
         <div class="s-label">Sistema Operacional</div>
@@ -356,118 +395,130 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-# ══════════════════════════════════════════════════════════════════════════════
-# ÁREA PRINCIPAL
-# ══════════════════════════════════════════════════════════════════════════════
-st.markdown("""
-<div class="app-header">
-  <div class="icon-box">⚙️</div>
-  <div>
-    <h1>🔧 Técnico Especialista em Manutenção Industrial</h1>
-    <p class="sub">🏆 Mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
-  </div>
-</div>
-""", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-# Botões de ação rápida
-b1, b2, b3 = st.columns(3)
-with b1:
-    if st.button("🔧 Diagnosticar Falha", use_container_width=True, key="q1"):
-        st.session_state.quick_prompt = "Preciso diagnosticar uma falha no equipamento. Me faça as perguntas necessárias para identificar o problema."; st.rerun()
-with b2:
-    if st.button("🔍 Identificar Componente", use_container_width=True, key="q2"):
-        st.session_state.quick_prompt = "Preciso identificar um componente hidráulico ou elétrico. Como posso descrevê-lo para você identificar?"; st.rerun()
-with b3:
-    if st.button("📋 Consultar Esquema", use_container_width=True, key="q3"):
-        st.session_state.quick_prompt = "Preciso de ajuda para interpretar ou montar um esquema hidráulico ou elétrico."; st.rerun()
+# ─────────────────────────────────────────────────
+# COLUNA DIREITA
+# ─────────────────────────────────────────────────
+with col_R:
 
-# Admin panel
-if st.session_state.get("admin_logged") and sb:
-    with st.expander("📚 BASE DE CONHECIMENTO", expanded=False):
-        tab1, tab2, tab3, tab4 = st.tabs(["📄 PDF","✍️ Texto","🎥 YouTube","🗂️ Gerenciar"])
-        with tab1:
-            pt = st.text_input("Título", placeholder="Ex: Manual Bomba Rexroth A10V", key="pdf_t")
-            pf = st.file_uploader("PDF", type=["pdf"], key="pdf_f")
-            if st.button("📤 Salvar PDF", key="btn_pdf"):
-                if not pt: st.warning("Digite um título.")
-                elif not pf: st.warning("Selecione um PDF.")
+    # Header / cartão principal da tela
+    st.markdown("""
+    <div class="hamburger">☰</div>
+    <div class="main-shell">
+      <div class="app-card">
+        <div class="app-header">
+          <div class="icon-box">⚙️</div>
+          <div>
+            <h1>🛠️ Técnico Especialista em Manutenção Industrial</h1>
+            <p class="sub">👨‍🔧 Mais de 20 anos de experiência em Hidráulica, Pneumática, Elétrica &amp; Automação</p>
+          </div>
+        </div>
+        <div class="intro-text">Olá! Sou seu assistente técnico experiente. Estou aqui para diagnosticar problemas e sugerir soluções rápidas para seu equipamento. Como posso ajudar?</div>
+        <div class="quick-row">
+    """, unsafe_allow_html=True)
+
+    # Botões de ação rápida (3 fixos)
+    b1, b2, b3 = st.columns(3)
+    with b1:
+        if st.button("🔧 Diagnosticar Falha", use_container_width=True, key="q1"):
+            st.session_state.quick_prompt = "Preciso diagnosticar uma falha no equipamento. Me faça as perguntas necessárias para identificar o problema."; st.rerun()
+    with b2:
+        if st.button("🔍 Identificar Componente", use_container_width=True, key="q2"):
+            st.session_state.quick_prompt = "Preciso identificar um componente hidráulico ou elétrico. Como posso descrevê-lo para você identificar?"; st.rerun()
+    with b3:
+        if st.button("📋 Consultar Esquema", use_container_width=True, key="q3"):
+            st.session_state.quick_prompt = "Preciso de ajuda para interpretar ou montar um esquema hidráulico ou elétrico."; st.rerun()
+
+    st.markdown("""
+        </div>
+      </div>
+    </div>
+    <div class="chat-area">
+    """, unsafe_allow_html=True)
+
+    # Admin panel
+    if st.session_state.get("admin_logged") and sb:
+        with st.expander("📚 BASE DE CONHECIMENTO", expanded=False):
+            tab1, tab2, tab3, tab4 = st.tabs(["📄 PDF","✍️ Texto","🎥 YouTube","🗂️ Gerenciar"])
+            with tab1:
+                pt = st.text_input("Título", placeholder="Ex: Manual Bomba Rexroth A10V", key="pdf_t")
+                pf = st.file_uploader("PDF", type=["pdf"], key="pdf_f")
+                if st.button("📤 Salvar PDF", key="btn_pdf"):
+                    if not pt: st.warning("Digite um título.")
+                    elif not pf: st.warning("Selecione um PDF.")
+                    else:
+                        with st.spinner("Processando..."):
+                            text = extract_pdf(pf.read())
+                            if text.startswith("Erro"): st.error(text)
+                            else: st.success(f"✅ {upload_doc(pt,text,'pdf',pf.name,sb)} fragmentos!"); st.rerun()
+            with tab2:
+                tt = st.text_input("Título", placeholder="Ex: Procedimento Troca de Óleo", key="txt_t")
+                tc = st.text_area("Conteúdo", placeholder="Cole o texto técnico aqui...", height=140, key="txt_c")
+                if st.button("💾 Salvar Texto", key="btn_txt"):
+                    if not tt: st.warning("Título obrigatório.")
+                    elif not tc: st.warning("Conteúdo obrigatório.")
+                    else:
+                        with st.spinner("Salvando..."): st.success(f"✅ {upload_doc(tt,tc,'text','manual',sb)} fragmentos!"); st.rerun()
+            with tab3:
+                yt = st.text_input("Título", placeholder="Ex: Aula Hidráulica Industrial", key="yt_t")
+                yu = st.text_input("URL YouTube", placeholder="https://youtube.com/watch?v=...", key="yt_u")
+                if st.button("📥 Extrair e Salvar", key="btn_yt"):
+                    if not yt: st.warning("Título obrigatório.")
+                    elif not yu: st.warning("URL obrigatória.")
+                    else:
+                        with st.spinner("Extraindo..."):
+                            text, err = get_youtube_transcript(yu)
+                            if err: st.error(f"Erro: {err}")
+                            else: st.success(f"✅ {upload_doc(yt,text,'youtube',yu,sb)} fragmentos!"); st.rerun()
+            with tab4:
+                docs = get_all_docs(sb)
+                if not docs: st.info("Base vazia.")
                 else:
-                    with st.spinner("Processando..."):
-                        text = extract_pdf(pf.read())
-                        if text.startswith("Erro"): st.error(text)
-                        else: st.success(f"✅ {upload_doc(pt,text,'pdf',pf.name,sb)} fragmentos!"); st.rerun()
-        with tab2:
-            tt = st.text_input("Título", placeholder="Ex: Procedimento Troca de Óleo", key="txt_t")
-            tc = st.text_area("Conteúdo", placeholder="Cole o texto técnico aqui...", height=140, key="txt_c")
-            if st.button("💾 Salvar Texto", key="btn_txt"):
-                if not tt: st.warning("Título obrigatório.")
-                elif not tc: st.warning("Conteúdo obrigatório.")
-                else:
-                    with st.spinner("Salvando..."): st.success(f"✅ {upload_doc(tt,tc,'text','manual',sb)} fragmentos!"); st.rerun()
-        with tab3:
-            yt = st.text_input("Título", placeholder="Ex: Aula Hidráulica Industrial", key="yt_t")
-            yu = st.text_input("URL YouTube", placeholder="https://youtube.com/watch?v=...", key="yt_u")
-            if st.button("📥 Extrair e Salvar", key="btn_yt"):
-                if not yt: st.warning("Título obrigatório.")
-                elif not yu: st.warning("URL obrigatória.")
-                else:
-                    with st.spinner("Extraindo..."):
-                        text, err = get_youtube_transcript(yu)
-                        if err: st.error(f"Erro: {err}")
-                        else: st.success(f"✅ {upload_doc(yt,text,'youtube',yu,sb)} fragmentos!"); st.rerun()
-        with tab4:
-            docs = get_all_docs(sb)
-            if not docs: st.info("Base vazia.")
-            else:
-                for title in list({d["title"] for d in docs}):
-                    chunks = [d for d in docs if d["title"]==title]
-                    src = chunks[0]["source_type"]
-                    color = {"pdf":"src-pdf","youtube":"src-youtube","text":"src-text"}.get(src,"src-text")
-                    c1,c2 = st.columns([5,1])
-                    with c1: st.markdown(f'<span class="source-tag {color}">{src.upper()}</span> **{title}** <small style="color:#5A6478">({len(chunks)} frag.)</small>', unsafe_allow_html=True)
-                    with c2:
-                        if st.button("🗑️", key=f"del_{title}"): delete_doc(title,sb); st.rerun()
-                    st.divider()
+                    for title in list({d["title"] for d in docs}):
+                        chunks = [d for d in docs if d["title"]==title]
+                        src = chunks[0]["source_type"]
+                        color = {"pdf":"src-pdf","youtube":"src-youtube","text":"src-text"}.get(src,"src-text")
+                        c1,c2 = st.columns([5,1])
+                        with c1: st.markdown(f'<span class="source-tag {color}">{src.upper()}</span> **{title}** <small style="color:#5A6478">({len(chunks)} frag.)</small>', unsafe_allow_html=True)
+                        with c2:
+                            if st.button("🗑️", key=f"del_{title}"): delete_doc(title,sb); st.rerun()
+                        st.divider()
 
-# Mensagens do chat
-for msg in st.session_state.messages:
-    avatar = "🔧" if msg["role"] == "assistant" else "👤"
-    with st.chat_message(msg["role"], avatar=avatar):
-        st.markdown(msg["content"])
-        if msg.get("image_bytes"):
-            st.image(PIL.Image.open(io.BytesIO(msg["image_bytes"])), width=300)
+    # Chat messages
+    for msg in st.session_state.messages:
+        avatar = "🔧" if msg["role"] == "assistant" else "👤"
+        with st.chat_message(msg["role"], avatar=avatar):
+            st.markdown(msg["content"])
+            if msg.get("image_bytes"):
+                st.image(PIL.Image.open(io.BytesIO(msg["image_bytes"])), width=300)
 
-# Ação rápida
-if st.session_state.quick_prompt:
-    qp = st.session_state.quick_prompt
-    st.session_state.quick_prompt = ""
-    with st.chat_message("user", avatar="👤"): st.markdown(qp)
-    st.session_state.messages.append({"role":"user","content":qp})
-    full = do_chat(qp, None, None, sb, kb_count)
-    if full: st.session_state.messages.append({"role":"assistant","content":full})
+    # Ação rápida
+    if st.session_state.quick_prompt:
+        qp = st.session_state.quick_prompt
+        st.session_state.quick_prompt = ""
+        with st.chat_message("user", avatar="👤"): st.markdown(qp)
+        st.session_state.messages.append({"role":"user","content":qp})
+        full = do_chat(qp, None, None, sb, kb_count)
+        if full: st.session_state.messages.append({"role":"assistant","content":full})
 
-# ── Chat input (com anexo de imagem no próprio campo, igual à imagem) ──────────
-chat = st.chat_input("Digite sua pergunta ou anexe uma foto...",
-                     accept_file=True, file_type=["jpg", "jpeg", "png", "webp"])
-if chat:
-    prompt = (chat.text or "").strip()
-    files  = chat.files or []
-    # Imagem: prioridade ao anexo do próprio campo; senão usa o da barra lateral
-    uf = files[0] if files else st.session_state.get("foto_up")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ── Chat input ────────────────────────────────────────────────────────────────
+if prompt := st.chat_input("Digite sua pergunta ou anexe uma foto..."):
+    uf = st.session_state.get("foto_up")
     img_b, mime, sfx = None, None, ""
     if uf:
         img_b = uf.read(); mime = uf.type; sfx = f"\n\n📷 *[{uf.name}]*"
-    if not prompt and img_b:
-        prompt = "Analise esta imagem do equipamento/componente e me diga o que você identifica."
 
-    if prompt or img_b:
-        display = prompt + sfx
-        umsg = {"role": "user", "content": display}
-        if img_b: umsg["image_bytes"] = img_b
-        st.session_state.messages.append(umsg)
+    display = prompt + sfx
+    umsg = {"role":"user","content":display}
+    if img_b: umsg["image_bytes"] = img_b
+    st.session_state.messages.append(umsg)
 
+    with col_R:
         with st.chat_message("user", avatar="👤"):
             st.markdown(display)
             if img_b: st.image(PIL.Image.open(io.BytesIO(img_b)), width=300)
         full = do_chat(prompt, img_b, mime, sb, kb_count)
-        if full: st.session_state.messages.append({"role": "assistant", "content": full})
+        if full: st.session_state.messages.append({"role":"assistant","content":full})
