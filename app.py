@@ -7,12 +7,14 @@ import io
 import os
 import re
 import hashlib
+import time
 
 # ── Configurações ─────────────────────────────────────────────────────────────
 SUPABASE_URL   = os.environ.get("SUPABASE_URL", "")
 SUPABASE_KEY   = os.environ.get("SUPABASE_KEY", "")
 GROQ_API_KEY   = os.environ.get("GROQ_API_KEY", "")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 
 TEXT_MODEL   = "llama-3.3-70b-versatile"
 VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
@@ -57,6 +59,7 @@ span[class*="material"] {
 
 #MainMenu, footer, .stDeployButton { display: none !important; }
 [data-testid="stToolbar"] { display: none !important; }
+[data-testid="manage-app-button"], ._link_gzau3_10, .stAppDeployButton { display: none !important; }
 header[data-testid="stHeader"] { background: transparent !important; }
 .stApp, .main { background: #12151C !important; }
 .block-container { padding: 1.5rem 2rem 7rem 2rem !important; max-width: 1180px !important; }
@@ -73,15 +76,27 @@ section[data-testid="stSidebar"] {
     transform: none !important;
     visibility: visible !important;
     margin-left: 0 !important;
+    position: relative !important;
 }
 [data-testid="stSidebar"] [data-testid="stSidebarUserContent"] { padding: 1.4rem 1.1rem !important; }
-/* Esconde o botão X de fechar nativo — usamos o botão toggle próprio */
+/* Esconde o botão X de fechar nativo */
 [data-testid="stSidebarCollapseButton"],
 [data-testid="stSidebarCollapsedControl"],
 [data-testid="collapsedControl"] { display: none !important; }
-/* Botão toggle da barra lateral — fixo no canto superior esquerdo, estilo discreto */
-.st-key-sidebar_toggle { position: fixed !important; top: 12px; left: 12px; z-index: 1000000; width: auto !important; }
-.st-key-sidebar_toggle button {
+
+/* Botão ✕ dentro da barra lateral (fechar) */
+.st-key-sidebar_close_btn { position: absolute !important; top: 10px; right: 10px; z-index: 9999; width: auto !important; }
+.st-key-sidebar_close_btn button {
+    background: rgba(255,255,255,.05) !important; color: #C8D0E0 !important;
+    border: 1px solid rgba(255,255,255,.1) !important; border-radius: 7px !important;
+    padding: 3px 10px !important; min-height: 0 !important; font-size: .95rem !important;
+}
+.st-key-sidebar_close_btn button:hover {
+    background: rgba(255,255,255,.1) !important; border-color: rgba(255,255,255,.25) !important;
+}
+/* Botão ☰ fora da barra lateral (abrir) — fixo no topo esquerdo */
+.st-key-sidebar_open_btn { position: fixed !important; top: 12px; left: 12px; z-index: 1000000; width: auto !important; }
+.st-key-sidebar_open_btn button {
     background: #1C2030 !important; color: #C8D0E0 !important;
     border: 1px solid #2D3448 !important; border-radius: 8px !important;
     padding: 4px 11px !important; min-height: 0 !important;
@@ -234,6 +249,8 @@ section[data-testid="stSidebar"] {
 .src-pdf     { background:#7f1d1d33; color:#fca5a5; border:1px solid #7f1d1d; }
 .src-youtube { background:#7f1d1d33; color:#f87171; border:1px solid #991b1b; }
 .src-text    { background:#14532d33; color:#86efac; border:1px solid #14532d; }
+.src-imagem  { background:#1e3a5f33; color:#93c5fd; border:1px solid #1e3a5f; }
+.src-video   { background:#3b1f6033; color:#c4b5fd; border:1px solid #3b1f60; }
 
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 5px; }
@@ -330,6 +347,71 @@ def transcribe_audio(audio_bytes, key):
     except Exception as e:
         return None, str(e)
 
+# ── Gemini 2.5 Flash helpers ──────────────────────────────────────────────────
+def analyze_image_gemini(image_bytes):
+    """Analisa imagem com Gemini 2.5 Flash. Retorna (texto, erro)."""
+    try:
+        import google.generativeai as genai
+        genai.configure(api_key=GEMINI_API_KEY)
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        img = PIL.Image.open(io.BytesIO(image_bytes))
+        prompt = (
+            "Descreva detalhadamente este equipamento, componente ou situação técnica industrial. "
+            "Inclua: identificação visual, possíveis problemas, especificações visíveis e recomendações técnicas."
+        )
+        response = model.generate_content([prompt, img])
+        return response.text, None
+    except Exception as e:
+        return None, str(e)
+
+def analyze_video_gemini(video_bytes, filename, mime_type):
+    """Analisa arquivo de vídeo com Gemini 2.5 Flash via Files API. Retorna (texto, erro)."""
+    try:
+        import google.generativeai as genai
+        import tempfile
+        genai.configure(api_key=GEMINI_API_KEY)
+        suffix = os.path.splitext(filename)[1] or ".mp4"
+        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+            tmp.write(video_bytes)
+            tmp_path = tmp.name
+        try:
+            video_file = genai.upload_file(path=tmp_path, mime_type=mime_type)
+            # Aguarda o Gemini processar o vídeo
+            while video_file.state.name == "PROCESSING":
+                time.sleep(2)
+                video_file = genai.get_file(video_file.name)
+            if video_file.state.name == "FAILED":
+                return None, "O Gemini não conseguiu processar o vídeo."
+            model = genai.GenerativeModel("gemini-2.5-flash")
+            prompt = (
+                "Analise este vídeo técnico industrial. Descreva detalhadamente: "
+                "equipamentos mostrados, procedimentos executados, problemas identificados, "
+                "especificações técnicas visíveis e recomendações de manutenção."
+            )
+            response = model.generate_content([prompt, video_file])
+            return response.text, None
+        finally:
+            os.unlink(tmp_path)
+    except Exception as e:
+        return None, str(e)
+
+def analyze_youtube_gemini(transcript):
+    """Analisa transcrição de vídeo YouTube com Gemini 2.5 Flash. Retorna (texto, erro)."""
+    try:
+        import google.generativeai as genai
+        genai.configure(api_key=GEMINI_API_KEY)
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        prompt = (
+            "Analise esta transcrição de vídeo técnico industrial. Descreva detalhadamente: "
+            "equipamentos mostrados, procedimentos executados, problemas identificados, "
+            "especificações técnicas visíveis e recomendações de manutenção.\n\nTRANSCRIÇÃO:\n"
+            + transcript[:15000]
+        )
+        response = model.generate_content(prompt)
+        return response.text, None
+    except Exception as e:
+        return None, str(e)
+
 def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
     rag = ""
     if sb and kb_count > 0:
@@ -386,21 +468,23 @@ if "messages"     not in st.session_state: st.session_state.messages     = []
 if "quick_prompt" not in st.session_state: st.session_state.quick_prompt = ""
 if "sidebar_open" not in st.session_state: st.session_state.sidebar_open = True
 
-# Botão toggle (☰ abre / ✕ fecha) controlando a barra lateral via session_state
+# Oculta a barra lateral quando fechada
 if not st.session_state.sidebar_open:
     st.markdown('<style>section[data-testid="stSidebar"]{display:none !important;}</style>', unsafe_allow_html=True)
-if st.button("✕" if st.session_state.sidebar_open else "☰", key="sidebar_toggle"):
-    st.session_state.sidebar_open = not st.session_state.sidebar_open
-    st.rerun()
+    # Botão ☰ fixo no topo esquerdo quando sidebar está fechada (CSS .st-key-sidebar_open_btn)
+    if st.button("☰", key="sidebar_open_btn"):
+        st.session_state.sidebar_open = True
+        st.rerun()
 
 # ══════════════════════════════════════════════════════════════════════════════
-# LAYOUT — barra lateral nativa (abre / fecha com o botão X e o ☰)
-# ══════════════════════════════════════════════════════════════════════════════
-
-# ─────────────────────────────────────────────────
 # BARRA LATERAL
-# ─────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
 with st.sidebar:
+    # Botão ✕ no topo da barra lateral para fechar (CSS .st-key-sidebar_close_btn)
+    if st.button("✕", key="sidebar_close_btn"):
+        st.session_state.sidebar_open = False
+        st.rerun()
+
     st.markdown('<div class="sec-title">RECURSOS ADICIONAIS</div>', unsafe_allow_html=True)
     st.markdown('<div class="upload-label">ANEXAR FOTO <span>(opcional)</span></div>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader("foto", type=["jpg","jpeg","png","webp"],
@@ -454,9 +538,9 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
 # ÁREA PRINCIPAL
-# ─────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
 with st.container():
     st.markdown(f"""
     <div class="app-header">
@@ -486,7 +570,7 @@ with st.container():
     # Admin panel
     if st.session_state.get("admin_logged") and sb:
         with st.expander("📚 BASE DE CONHECIMENTO", expanded=False):
-            tab1, tab2, tab3, tab4 = st.tabs(["📄 PDF","✍️ Texto","🎥 YouTube","🗂️ Gerenciar"])
+            tab1, tab2, tab3, tab4, tab5 = st.tabs(["📄 PDF","✍️ Texto","🎥 YouTube","🎬 Vídeo/Imagem","🗂️ Gerenciar"])
             with tab1:
                 pt = st.text_input("Título", placeholder="Ex: Manual Bomba Rexroth A10V", key="pdf_t")
                 pf = st.file_uploader("PDF", type=["pdf"], key="pdf_f")
@@ -518,13 +602,73 @@ with st.container():
                             if err: st.error(f"Erro: {err}")
                             else: st.success(f"✅ {upload_doc(yt,text,'youtube',yu,sb)} fragmentos!"); st.rerun()
             with tab4:
+                if not GEMINI_API_KEY:
+                    st.warning("⚠️ GEMINI_API_KEY não configurada. Configure nas variáveis de ambiente do Streamlit Cloud.")
+                else:
+                    modo = st.radio("Tipo de análise", ["🖼️ Imagem", "🎬 Vídeo"], horizontal=True, key="gemini_mode")
+                    if modo == "🖼️ Imagem":
+                        st.markdown("**Analisa imagens técnicas com Google Gemini 2.5 Flash**")
+                        gi_t = st.text_input("Título", placeholder="Ex: Foto Bomba Hidráulica Danificada", key="gi_t")
+                        gi_f = st.file_uploader("Imagem", type=["jpg","jpeg","png","webp"], key="gi_f")
+                        if gi_f:
+                            st.image(gi_f, use_container_width=True)
+                        if st.button("🔍 Analisar e Salvar", key="btn_gi"):
+                            if not gi_t:
+                                st.warning("Digite um título.")
+                            elif not gi_f:
+                                st.warning("Selecione uma imagem.")
+                            else:
+                                with st.spinner("🤖 Analisando com Gemini 2.5 Flash..."):
+                                    analysis, err = analyze_image_gemini(gi_f.read())
+                                if err:
+                                    st.error(f"Erro: {err}")
+                                else:
+                                    n = upload_doc(gi_t, analysis, "imagem", gi_f.name, sb)
+                                    st.success(f"✅ {n} fragmentos salvos na base de conhecimento!")
+                                    st.rerun()
+                    else:  # Vídeo
+                        st.markdown("**Analisa vídeos técnicos com Google Gemini 2.5 Flash**")
+                        gv_t = st.text_input("Título", placeholder="Ex: Vídeo Manutenção Compressor", key="gv_t")
+                        st.markdown("**Arquivo de vídeo** (MP4, MOV, AVI):")
+                        gv_f = st.file_uploader("Vídeo", type=["mp4","mov","avi"], key="gv_f")
+                        st.markdown("— ou —")
+                        gv_yt = st.text_input("URL YouTube", placeholder="https://youtube.com/watch?v=...", key="gv_yt")
+                        if st.button("🎬 Analisar e Salvar", key="btn_gv"):
+                            if not gv_t:
+                                st.warning("Digite um título.")
+                            elif not gv_f and not gv_yt:
+                                st.warning("Selecione um arquivo de vídeo ou informe uma URL do YouTube.")
+                            elif gv_f:
+                                with st.spinner("📤 Enviando vídeo para o Gemini (pode demorar)..."):
+                                    analysis, err = analyze_video_gemini(gv_f.read(), gv_f.name, gv_f.type)
+                                if err:
+                                    st.error(f"Erro: {err}")
+                                else:
+                                    n = upload_doc(gv_t, analysis, "video", gv_f.name, sb)
+                                    st.success(f"✅ {n} fragmentos salvos na base de conhecimento!")
+                                    st.rerun()
+                            else:  # YouTube URL
+                                with st.spinner("🎥 Extraindo transcrição do YouTube..."):
+                                    transcript, err = get_youtube_transcript(gv_yt)
+                                if err:
+                                    st.error(f"Erro ao extrair transcrição: {err}")
+                                else:
+                                    with st.spinner("🤖 Analisando com Gemini 2.5 Flash..."):
+                                        analysis, err = analyze_youtube_gemini(transcript)
+                                    if err:
+                                        st.error(f"Erro no Gemini: {err}")
+                                    else:
+                                        n = upload_doc(gv_t, analysis, "video", gv_yt, sb)
+                                        st.success(f"✅ {n} fragmentos salvos na base de conhecimento!")
+                                        st.rerun()
+            with tab5:
                 docs = get_all_docs(sb)
                 if not docs: st.info("Base vazia.")
                 else:
                     for title in list({d["title"] for d in docs}):
                         chunks = [d for d in docs if d["title"]==title]
                         src = chunks[0]["source_type"]
-                        color = {"pdf":"src-pdf","youtube":"src-youtube","text":"src-text"}.get(src,"src-text")
+                        color = {"pdf":"src-pdf","youtube":"src-youtube","text":"src-text","imagem":"src-imagem","video":"src-video"}.get(src,"src-text")
                         c1,c2 = st.columns([5,1])
                         with c1: st.markdown(f'<span class="source-tag {color}">{src.upper()}</span> **{title}** <small style="color:#5A6478">({len(chunks)} frag.)</small>', unsafe_allow_html=True)
                         with c2:
@@ -539,7 +683,7 @@ with st.container():
             if msg.get("image_bytes"):
                 st.image(PIL.Image.open(io.BytesIO(msg["image_bytes"])), width=300)
 
-    # Ação rápida
+    # Ação rápida (botões + voz)
     if st.session_state.quick_prompt:
         qp = st.session_state.quick_prompt
         st.session_state.quick_prompt = ""
@@ -548,32 +692,29 @@ with st.container():
         full = do_chat(qp, None, None, sb, kb_count)
         if full: st.session_state.messages.append({"role":"assistant","content":full})
 
-# ── Microfone (toggle) ao lado do campo + gravador em modal (oculto por padrão) ──
-mic_col, _ = st.columns([1, 9])
-with mic_col:
-    if st.button("🎙️", key="mic_toggle", help="Perguntar por voz"):
-        st.session_state.show_voice = not st.session_state.get("show_voice", False)
-        st.rerun()
+# ── Microfone + Chat input lado a lado ──────────────────────────────────────────
+voice_col, chat_col = st.columns([2, 9])
+with voice_col:
+    audio = st.audio_input("🎤", label_visibility="collapsed", key="voice_in")
+with chat_col:
+    chat = st.chat_input("Digite sua pergunta, anexe uma foto ou cole um link do YouTube...",
+                         accept_file=True, file_type=["jpg", "jpeg", "png", "webp"])
 
-if st.session_state.get("show_voice"):
-    audio = st.audio_input("voz", label_visibility="collapsed", key="voice_in")
-    if audio is not None:
-        ab = audio.getvalue()
-        sig = hashlib.md5(ab).hexdigest()
-        if st.session_state.get("last_voice_sig") != sig:
-            st.session_state.last_voice_sig = sig
-            with st.spinner("🎤 Transcrevendo sua fala..."):
-                vtext, verr = transcribe_audio(ab, GROQ_API_KEY)
-            if vtext:
-                st.session_state.show_voice = False
-                st.session_state.quick_prompt = vtext
-                st.rerun()
-            else:
-                st.error(f"Não entendi o áudio: {verr}")
+# Processa áudio (voz → transcrição → quick_prompt)
+if audio is not None:
+    ab = audio.getvalue()
+    sig = hashlib.md5(ab).hexdigest()
+    if st.session_state.get("last_voice_sig") != sig:
+        st.session_state.last_voice_sig = sig
+        with st.spinner("🎤 Transcrevendo sua fala..."):
+            vtext, verr = transcribe_audio(ab, GROQ_API_KEY)
+        if vtext:
+            st.session_state.quick_prompt = vtext
+            st.rerun()
+        else:
+            st.error(f"Não entendi o áudio: {verr}")
 
-# ── Chat input (com anexo de imagem no próprio campo, igual à imagem) ──────────
-chat = st.chat_input("Digite sua pergunta, anexe uma foto ou cole um link do YouTube...",
-                     accept_file=True, file_type=["jpg", "jpeg", "png", "webp"])
+# Processa texto/imagem do chat input
 if chat:
     prompt = (chat.text or "").strip()
     files  = chat.files or []
