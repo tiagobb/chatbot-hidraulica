@@ -116,6 +116,9 @@ section[data-testid="stSidebar"][aria-expanded="false"] {
     font-size: .96rem; color: #D4DBEA;
 }
 .exp-item .ei { font-size: 1.18rem; min-width: 22px; text-align: center; }
+/* Grade responsiva: 2 colunas no celular, 3 no desktop */
+.exp-grid { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 6px; }
+@media (min-width: 768px) { .exp-grid { grid-template-columns: repeat(3, 1fr); } }
 
 /* Status */
 .status-pill {
@@ -370,7 +373,7 @@ def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
     return full
 
 # ══════════════════════════════════════════════════════════════════════════════
-st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="centered", initial_sidebar_state="expanded")
 st.markdown(CSS, unsafe_allow_html=True)
 
 if not GROQ_API_KEY:
@@ -398,23 +401,8 @@ with st.sidebar:
         st.image(uploaded_file, use_container_width=True)
         st.caption("✅ Será enviada com a próxima mensagem")
 
-    st.markdown('<div class="upload-label" style="margin-top:14px;">PERGUNTAR POR VOZ <span>(grave e solte)</span></div>', unsafe_allow_html=True)
-    audio = st.audio_input("voz", label_visibility="collapsed", key="voice_in")
-    if audio is not None:
-        ab = audio.getvalue()
-        sig = hashlib.md5(ab).hexdigest()
-        if st.session_state.get("last_voice_sig") != sig:
-            st.session_state.last_voice_sig = sig
-            with st.spinner("🎤 Transcrevendo sua fala..."):
-                vtext, verr = transcribe_audio(ab, GROQ_API_KEY)
-            if vtext:
-                st.session_state.quick_prompt = vtext
-                st.rerun()
-            else:
-                st.error(f"Não entendi o áudio: {verr}")
-
     st.markdown('<div class="sec-title" style="margin-top:18px;">ÁREAS DE EXPERTISE</div>', unsafe_allow_html=True)
-    for icon, label in [
+    exp_items = [
         ("🔧","Hidráulica Industrial"),
         ("⚡","Elétrica Industrial"),
         ("🔌","Eletrônica / VFD"),
@@ -422,9 +410,13 @@ with st.sidebar:
         ("🔩","Mecânica Industrial"),
         ("🤖","Automação / CLP"),
         ("🌐","Redes Industriais"),
-    ]:
-        st.markdown(f'<div class="exp-item"><span class="ei">{icon}</span>{label}</div>',
-                    unsafe_allow_html=True)
+    ]
+    st.markdown(
+        '<div class="exp-grid">'
+        + "".join(f'<div class="exp-item"><span class="ei">{icon}</span>{label}</div>' for icon, label in exp_items)
+        + '</div>',
+        unsafe_allow_html=True,
+    )
 
     st.markdown('<div style="margin-top:16px;"></div>', unsafe_allow_html=True)
 
@@ -547,6 +539,29 @@ with st.container():
         st.session_state.messages.append({"role":"user","content":qp})
         full = do_chat(qp, None, None, sb, kb_count)
         if full: st.session_state.messages.append({"role":"assistant","content":full})
+
+# ── Microfone (toggle) ao lado do campo + gravador em modal (oculto por padrão) ──
+mic_col, _ = st.columns([1, 9])
+with mic_col:
+    if st.button("🎙️", key="mic_toggle", help="Perguntar por voz"):
+        st.session_state.show_voice = not st.session_state.get("show_voice", False)
+        st.rerun()
+
+if st.session_state.get("show_voice"):
+    audio = st.audio_input("voz", label_visibility="collapsed", key="voice_in")
+    if audio is not None:
+        ab = audio.getvalue()
+        sig = hashlib.md5(ab).hexdigest()
+        if st.session_state.get("last_voice_sig") != sig:
+            st.session_state.last_voice_sig = sig
+            with st.spinner("🎤 Transcrevendo sua fala..."):
+                vtext, verr = transcribe_audio(ab, GROQ_API_KEY)
+            if vtext:
+                st.session_state.show_voice = False
+                st.session_state.quick_prompt = vtext
+                st.rerun()
+            else:
+                st.error(f"Não entendi o áudio: {verr}")
 
 # ── Chat input (com anexo de imagem no próprio campo, igual à imagem) ──────────
 chat = st.chat_input("Digite sua pergunta, anexe uma foto ou cole um link do YouTube...",
