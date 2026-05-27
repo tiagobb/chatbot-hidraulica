@@ -446,20 +446,28 @@ if st.session_state.quick_prompt:
     full = do_chat(qp, None, None, sb, kb_count)
     if full: st.session_state.messages.append({"role":"assistant","content":full})
 
-# ── Chat input ────────────────────────────────────────────────────────────────
-if prompt := st.chat_input("Digite sua pergunta ou anexe uma foto..."):
-    uf = st.session_state.get("foto_up")
+# ── Chat input (com anexo de imagem no próprio campo, igual à imagem) ──────────
+chat = st.chat_input("Digite sua pergunta ou anexe uma foto...",
+                     accept_file=True, file_type=["jpg", "jpeg", "png", "webp"])
+if chat:
+    prompt = (chat.text or "").strip()
+    files  = chat.files or []
+    # Imagem: prioridade ao anexo do próprio campo; senão usa o da barra lateral
+    uf = files[0] if files else st.session_state.get("foto_up")
     img_b, mime, sfx = None, None, ""
     if uf:
         img_b = uf.read(); mime = uf.type; sfx = f"\n\n📷 *[{uf.name}]*"
+    if not prompt and img_b:
+        prompt = "Analise esta imagem do equipamento/componente e me diga o que você identifica."
 
-    display = prompt + sfx
-    umsg = {"role":"user","content":display}
-    if img_b: umsg["image_bytes"] = img_b
-    st.session_state.messages.append(umsg)
+    if prompt or img_b:
+        display = prompt + sfx
+        umsg = {"role": "user", "content": display}
+        if img_b: umsg["image_bytes"] = img_b
+        st.session_state.messages.append(umsg)
 
-    with st.chat_message("user", avatar="👤"):
-        st.markdown(display)
-        if img_b: st.image(PIL.Image.open(io.BytesIO(img_b)), width=300)
-    full = do_chat(prompt, img_b, mime, sb, kb_count)
-    if full: st.session_state.messages.append({"role":"assistant","content":full})
+        with st.chat_message("user", avatar="👤"):
+            st.markdown(display)
+            if img_b: st.image(PIL.Image.open(io.BytesIO(img_b)), width=300)
+        full = do_chat(prompt, img_b, mime, sb, kb_count)
+        if full: st.session_state.messages.append({"role": "assistant", "content": full})
