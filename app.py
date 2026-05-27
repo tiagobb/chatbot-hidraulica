@@ -34,74 +34,57 @@ WELCOME_MSG = "Olá! Sou seu assistente técnico experiente. Estou aqui para dia
 CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-/* Fonte Inter SOMENTE em elementos de texto — NUNCA em ícones (Material Symbols) */
-* { box-sizing: border-box; }
-html, body, .stApp, button, input, textarea, select,
-p, h1, h2, h3, h4, h5, h6, li, a, label,
-.stMarkdown, [data-testid="stMarkdownContainer"] {
-    font-family: 'Inter', sans-serif !important;
-}
-/* Restaura a fonte dos ícones para não virarem texto cru */
-[data-testid="stIconMaterial"], .material-symbols-rounded, .material-icons,
-span[class*="material"] {
-    font-family: 'Material Symbols Rounded','Material Icons' !important;
-}
-
+* { font-family: 'Inter', sans-serif !important; box-sizing: border-box; }
 #MainMenu, footer, header, .stDeployButton { display: none !important; }
 [data-testid="stToolbar"]        { display: none !important; }
 [data-testid="stSidebar"]        { display: none !important; }
 [data-testid="collapsedControl"] { display: none !important; }
 .stApp, .main { background: #12151C !important; }
-.block-container { padding: 1rem 1.2rem 6rem 1.2rem !important; max-width: 1280px !important; }
+.block-container { padding: 0rem .8rem 5rem .8rem !important; max-width: 100% !important; }
 
 /* ═══════════════════════════════
-   PAINEL ESQUERDO  (1ª coluna que contém o marcador)
+   PAINEL ESQUERDO (coluna)
 ═══════════════════════════════ */
-[data-testid="stColumn"]:has(.left-marker) {
+.left-col {
     background: #1C2030;
-    border-radius: 14px;
+    border-radius: 12px;
     border: 1px solid #252B3B;
-    padding: 18px 16px !important;
-    align-self: flex-start;
+    padding: 16px 12px;
+    min-height: 96vh; margin-top:-18px; position:sticky; top:10px;
 }
-.left-marker { display: none; }
-
 .sec-title {
     font-size: .62rem; font-weight: 700; letter-spacing: 2px;
     color: #5A6478; text-transform: uppercase;
-    border-bottom: 1px solid #252B3B; padding-bottom: 8px;
-    margin: 4px 0 12px 0;
+    border-bottom: 1px solid #252B3B; padding-bottom: 8px; margin-bottom: 12px;
 }
-.upload-label { font-size: .75rem; font-weight: 600; color: #8A96AD; margin-bottom: 4px; }
+/* Upload button */
+.upload-label {
+    font-size: .75rem; font-weight: 600; color: #8A96AD; margin-bottom: 6px;
+}
 .upload-label span { font-weight: 400; color: #5A6478; }
-
-/* File uploader */
-[data-testid="stFileUploader"] { background: transparent !important; }
-[data-testid="stFileUploaderDropzone"], [data-testid="stFileDropzone"] {
+[data-testid="stFileUploader"] { background: transparent !important; border: none !important; }
+[data-testid="stFileDropzone"] {
     background: #12151C !important; border: 1.5px dashed #2D3448 !important;
-    border-radius: 8px !important; padding: 10px !important; min-height: auto !important;
+    border-radius: 8px !important; padding: 10px !important;
 }
-[data-testid="stFileUploaderDropzone"] *, [data-testid="stFileDropzone"] * { color: #8A96AD !important; }
-[data-testid="stFileUploaderDropzone"] button, [data-testid="stFileDropzone"] button {
+[data-testid="stFileDropzone"] * { color: #8A96AD !important; }
+[data-testid="stFileDropzone"] button {
     background: #252B3B !important; color: #C8D0E0 !important;
     border: 1px solid #363D55 !important; border-radius: 6px !important;
     font-size: .78rem !important; padding: 5px 14px !important;
 }
-
-/* Lista de expertise */
+/* Expertise list */
 .exp-item {
     display: flex; align-items: center; gap: 8px;
-    padding: 8px 11px; border-radius: 7px; margin-bottom: 4px;
+    padding: 7px 10px; border-radius: 7px; margin-bottom: 3px;
     background: #12151C; border: 1px solid #1E2435;
-    font-size: .82rem; color: #C0C8D8;
+    font-size: .81rem; color: #C0C8D8;
 }
-.exp-item .ei { font-size: 1rem; min-width: 18px; text-align: center; }
-
+.exp-item .ei { font-size: 1rem; min-width: 18px; }
 /* Status */
 .status-pill {
     background: #12151C; border: 1px solid #1E2435;
-    border-radius: 8px; padding: 11px 14px; margin-top: 14px;
+    border-radius: 8px; padding: 10px 14px; margin-top: 16px;
 }
 .status-pill .s-label { font-size: .6rem; color: #5A6478; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 3px; }
 .status-pill .s-val   { font-size: .82rem; color: #2ECC71; font-weight: 600; }
@@ -111,7 +94,7 @@ span[class*="material"] {
 ═══════════════════════════════ */
 .app-header {
     background: linear-gradient(135deg, #1A2035 0%, #1E2845 60%, #1A2035 100%);
-    border-radius: 14px; padding: 20px 24px; margin-bottom: 16px;
+    border-radius: 14px; padding: 20px 24px; margin-bottom: 14px;
     border: 1px solid #2A3555; box-shadow: 0 6px 24px rgba(0,0,0,.3);
     display: flex; align-items: center; gap: 18px;
 }
@@ -121,11 +104,11 @@ span[class*="material"] {
     justify-content: center; font-size: 1.8rem; flex-shrink: 0;
     border: 1px solid #363D55;
 }
-.app-header h1 { color: #FFFFFF !important; font-size: 1.28rem; font-weight: 800; margin: 0 0 4px 0 !important; }
+.app-header h1 { color: #FFFFFF; font-size: 1.35rem; font-weight: 800; margin: 0 0 4px 0; }
 .app-header .sub { color: #7A8BAD; font-size: .78rem; margin: 0; }
 
 /* ═══════════════════════════════
-   BOTÕES
+   QUICK ACTION BUTTONS
 ═══════════════════════════════ */
 .stButton > button {
     background: #1C2030 !important; color: #C8D0E0 !important;
@@ -144,10 +127,13 @@ span[class*="material"] {
 ═══════════════════════════════ */
 [data-testid="stChatMessage"] { background: transparent !important; border: none !important; padding: 3px 0 !important; }
 [data-testid="stChatMessage"] > div { background: transparent !important; }
+
+/* Balão do assistente */
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stMarkdownContainer"] {
     background: #1C2030 !important; border-radius: 4px 14px 14px 14px !important;
     padding: 12px 16px !important; border: 1px solid #252B3B !important;
 }
+/* Balão do usuário */
 [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stMarkdownContainer"] {
     background: linear-gradient(135deg, #1A6B4A, #1E8A5E) !important;
     border-radius: 14px 4px 14px 14px !important; padding: 11px 15px !important;
@@ -175,18 +161,26 @@ span[class*="material"] {
     background: #12151C !important; color: #D8E0F0 !important;
     border: 1px solid #2D3448 !important; border-radius: 8px !important;
 }
-[data-testid="stExpander"] { background: #12151C !important; border: 1px solid #252B3B !important; border-radius: 10px !important; }
-[data-testid="stExpander"] summary p { color: #C8D0E0 !important; }
-.stAlert { background: #12151C !important; border-radius: 8px !important; }
+[data-testid="stExpander"] { background: #1C2030 !important; border: 1px solid #252B3B !important; border-radius: 10px !important; }
+[data-testid="stExpander"] * { color: #D8E0F0 !important; }
+.stAlert { background: #1C2030 !important; border-radius: 8px !important; }
 .source-tag { display:inline-block; padding:2px 8px; border-radius:12px; font-size:.7rem; font-weight:600; }
 .src-pdf     { background:#7f1d1d33; color:#fca5a5; border:1px solid #7f1d1d; }
 .src-youtube { background:#7f1d1d33; color:#f87171; border:1px solid #991b1b; }
 .src-text    { background:#14532d33; color:#86efac; border:1px solid #14532d; }
 
-/* SCROLLBAR */
-::-webkit-scrollbar { width: 5px; }
+/* ═══════════════════════════════
+   SCROLLBAR
+═══════════════════════════════ */
+::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: #12151C; }
 ::-webkit-scrollbar-thumb { background: #2D3448; border-radius: 2px; }
+
+/* AJUSTE DE POSIÇÃO SUPERIOR */
+section.main > div {
+    padding-top: 0rem !important;
+}
+
 </style>
 """
 
@@ -305,16 +299,17 @@ if "messages"     not in st.session_state: st.session_state.messages     = [{"ro
 if "quick_prompt" not in st.session_state: st.session_state.quick_prompt = ""
 
 # ══════════════════════════════════════════════════════════════════════════════
-# LAYOUT — duas colunas fixas (painel sempre visível)
+# LAYOUT
 # ══════════════════════════════════════════════════════════════════════════════
-col_L, col_R = st.columns([1, 3], gap="medium")
+col_L, col_R = st.columns([1, 4], gap="small")
 
 # ─────────────────────────────────────────────────
 # PAINEL ESQUERDO
 # ─────────────────────────────────────────────────
 with col_L:
-    st.markdown('<span class="left-marker"></span>', unsafe_allow_html=True)
+    st.markdown('<div class="left-col">', unsafe_allow_html=True)
 
+    # Foto
     st.markdown('<div class="sec-title">RECURSOS ADICIONAIS</div>', unsafe_allow_html=True)
     st.markdown('<div class="upload-label">ANEXAR FOTO <span>(opcional)</span></div>', unsafe_allow_html=True)
     uploaded_file = st.file_uploader("foto", type=["jpg","jpeg","png","webp"],
@@ -323,7 +318,10 @@ with col_L:
         st.image(uploaded_file, use_container_width=True)
         st.caption("✅ Será enviada com a próxima mensagem")
 
-    st.markdown('<div class="sec-title" style="margin-top:18px;">ÁREAS DE EXPERTISE</div>', unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Expertise — lista estática
+    st.markdown('<div class="sec-title">ÁREAS DE EXPERTISE</div>', unsafe_allow_html=True)
     for icon, label in [
         ("🔧","Hidráulica Industrial"),
         ("⚡","Elétrica Industrial"),
@@ -336,9 +334,9 @@ with col_L:
         st.markdown(f'<div class="exp-item"><span class="ei">{icon}</span>{label}</div>',
                     unsafe_allow_html=True)
 
-    st.markdown('<div style="margin-top:16px;"></div>', unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
-    # Admin
+    # Admin (oculto por padrão)
     if not st.session_state.get("admin_logged"):
         with st.expander("🔐 Admin", expanded=False):
             pwd = st.text_input("Senha", type="password", label_visibility="collapsed",
@@ -348,7 +346,7 @@ with col_L:
                     st.session_state.admin_logged = True; st.rerun()
                 else: st.error("Senha incorreta")
     else:
-        st.success("✅ Admin conectado")
+        st.success("✅ Admin")
         if st.button("Sair", use_container_width=True, key="btn_sair"):
             st.session_state.admin_logged = False; st.rerun()
 
@@ -356,6 +354,7 @@ with col_L:
         st.session_state.messages = [{"role":"assistant","content":WELCOME_MSG}]
         st.session_state.quick_prompt = ""; st.rerun()
 
+    # Status
     st.markdown(f"""
     <div class="status-pill">
         <div class="s-label">Sistema Operacional</div>
@@ -363,10 +362,14 @@ with col_L:
     </div>
     """, unsafe_allow_html=True)
 
+    st.markdown('</div>', unsafe_allow_html=True)
+
 # ─────────────────────────────────────────────────
 # COLUNA DIREITA
 # ─────────────────────────────────────────────────
 with col_R:
+
+    # Header
     st.markdown("""
     <div class="app-header">
       <div class="icon-box">⚙️</div>
@@ -377,7 +380,7 @@ with col_R:
     </div>
     """, unsafe_allow_html=True)
 
-    # Botões de ação rápida
+    # Botões de ação rápida (3 fixos)
     b1, b2, b3 = st.columns(3)
     with b1:
         if st.button("🔧 Diagnosticar Falha", use_container_width=True, key="q1"):
@@ -437,7 +440,7 @@ with col_R:
                             if st.button("🗑️", key=f"del_{title}"): delete_doc(title,sb); st.rerun()
                         st.divider()
 
-    # Mensagens do chat
+    # Chat messages
     for msg in st.session_state.messages:
         avatar = "🔧" if msg["role"] == "assistant" else "👤"
         with st.chat_message(msg["role"], avatar=avatar):
@@ -454,28 +457,21 @@ with col_R:
         full = do_chat(qp, None, None, sb, kb_count)
         if full: st.session_state.messages.append({"role":"assistant","content":full})
 
-# ── Chat input (com anexo de imagem no próprio campo, igual à imagem) ──────────
-chat = st.chat_input("Digite sua pergunta ou anexe uma foto...",
-                     accept_file=True, file_type=["jpg", "jpeg", "png", "webp"])
-if chat:
-    prompt = (chat.text or "").strip()
-    files  = chat.files or []
-    uf = files[0] if files else st.session_state.get("foto_up")
+# ── Chat input ────────────────────────────────────────────────────────────────
+if prompt := st.chat_input("Digite sua pergunta ou anexe uma foto..."):
+    uf = st.session_state.get("foto_up")
     img_b, mime, sfx = None, None, ""
     if uf:
         img_b = uf.read(); mime = uf.type; sfx = f"\n\n📷 *[{uf.name}]*"
-    if not prompt and img_b:
-        prompt = "Analise esta imagem do equipamento/componente e me diga o que você identifica."
 
-    if prompt or img_b:
-        display = prompt + sfx
-        umsg = {"role": "user", "content": display}
-        if img_b: umsg["image_bytes"] = img_b
-        st.session_state.messages.append(umsg)
+    display = prompt + sfx
+    umsg = {"role":"user","content":display}
+    if img_b: umsg["image_bytes"] = img_b
+    st.session_state.messages.append(umsg)
 
-        with col_R:
-            with st.chat_message("user", avatar="👤"):
-                st.markdown(display)
-                if img_b: st.image(PIL.Image.open(io.BytesIO(img_b)), width=300)
-            full = do_chat(prompt, img_b, mime, sb, kb_count)
-            if full: st.session_state.messages.append({"role": "assistant", "content": full})
+    with col_R:
+        with st.chat_message("user", avatar="👤"):
+            st.markdown(display)
+            if img_b: st.image(PIL.Image.open(io.BytesIO(img_b)), width=300)
+        full = do_chat(prompt, img_b, mime, sb, kb_count)
+        if full: st.session_state.messages.append({"role":"assistant","content":full})
