@@ -40,6 +40,24 @@ Responda sempre em português do Brasil."""
 
 WELCOME_MSG = "Olá! Sou seu assistente técnico experiente. Estou aqui para diagnosticar problemas e sugerir soluções rápidas para seu equipamento. Como posso ajudar?"
 
+# Contexto técnico injetado no system prompt conforme a Área de Expertise selecionada
+AREA_CONTEXT = {
+    "Hidráulica Industrial": "O usuário está com dúvida específica de Hidráulica Industrial. Priorize: circuitos hidráulicos, bombas, válvulas, cilindros, simbologia ISO 1219, óleos hidráulicos, pressão, vazão e servo-hidráulica.",
+    "Elétrica Industrial": "Foque em: motores elétricos, quadros de comando, CLPs, NR-10, NBR 5410, NR-12, diagramas elétricos, fusíveis, relés e inversores.",
+    "Eletrônica / VFD": "Foque em: inversores de frequência, soft-starters, sensores, instrumentação, placas eletrônicas, osciloscópio e componentes SMD.",
+    "Eletromecânica / CNC": "Foque em: servo-motores, encoders, fusos de esferas, guias lineares, CNC, freios eletromagnéticos e alarmes de máquina.",
+    "Mecânica Industrial": "Foque em: rolamentos, vedações, transmissões por correia/corrente, redutores, alinhamento, balanceamento e lubrificação.",
+    "Automação / CLP": "Foque em: CLPs Siemens/Allen-Bradley/Schneider, linguagens Ladder/FBD/ST, PID, IHM, SCADA, Indústria 4.0 e IIoT.",
+    "Redes Industriais": "Foque em: Profibus, Profinet, Modbus RTU/TCP, Ethernet/IP, OPC-UA, switches industriais e diagnóstico de rede.",
+}
+
+# Instrução para o modelo sugerir termos de busca de imagem (URLs reais buscadas no Wikimedia, nunca inventadas)
+IMG_INSTRUCTION = ("\n\nINSTRUÇÃO DE IMAGEM: Ao FINAL da resposta, em uma última linha separada e em texto puro "
+    "(sem markdown), escreva 'IMG_SEARCH:' seguido de 1 ou 2 termos curtos EM INGLÊS separados por '|' "
+    "para localizar imagens técnicas REAIS que ilustrem os componentes/esquemas citados "
+    "(ex: 'IMG_SEARCH: hydraulic directional valve | ISO 1219 symbol'). "
+    "Se não fizer sentido ilustrar, escreva 'IMG_SEARCH: none'. NUNCA escreva URLs.")
+
 CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -143,6 +161,29 @@ section[data-testid="stSidebar"] {
 .exp-item .ei { font-size: .92rem; min-width: 14px; text-align: center; }
 /* Grade de 2 colunas */
 .exp-grid { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 5px; }
+
+/* Botões clicáveis de Áreas de Expertise — visual compacto tipo lista (somente estes botões) */
+section[data-testid="stSidebar"] [data-testid="stHorizontalBlock"] { gap: 5px !important; }
+div[class*="st-key-exp_"] button {
+    background: rgba(255,255,255,.03) !important;
+    border: 1px solid rgba(255,255,255,.06) !important;
+    border-radius: 8px !important;
+    padding: 5px 6px !important;
+    min-height: 0 !important;
+    font-size: .6rem !important;
+    font-weight: 500 !important;
+    color: #D4DBEA !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    line-height: 1.15 !important;
+}
+div[class*="st-key-exp_"] button p, div[class*="st-key-exp_"] button div {
+    font-size: .6rem !important; white-space: nowrap !important;
+}
+div[class*="st-key-exp_"] button:hover {
+    background: rgba(255,255,255,.07) !important; border-color: #4A7AC8 !important;
+    color: #FFFFFF !important; transform: none !important; box-shadow: none !important;
+}
 
 /* Status */
 .status-pill {
@@ -356,6 +397,33 @@ def transcribe_audio(audio_bytes, key):
     except Exception as e:
         return None, str(e)
 
+def search_images(query, limit=2):
+    """Busca imagens REAIS no Wikimedia Commons. Retorna lista de (url, titulo). Nunca inventa URLs."""
+    try:
+        params = {
+            "action": "query", "format": "json",
+            "generator": "search", "gsrnamespace": 6,
+            "gsrsearch": query, "gsrlimit": max(limit, 3),
+            "prop": "imageinfo", "iiprop": "url", "iiurlwidth": 500,
+        }
+        r = requests.get("https://commons.wikimedia.org/w/api.php", params=params, timeout=15,
+                         headers={"User-Agent": "TecnicoManutencaoIndustrial/1.0"})
+        r.raise_for_status()
+        pages = r.json().get("query", {}).get("pages", {})
+        out = []
+        for p in sorted(pages.values(), key=lambda x: x.get("index", 99)):
+            info = (p.get("imageinfo") or [{}])[0]
+            url = info.get("thumburl") or info.get("url")
+            if not url: continue
+            ext = url.lower().rsplit(".", 1)[-1]
+            if ext not in ("jpg", "jpeg", "png", "gif", "webp", "svg"): continue
+            title = p.get("title", "").replace("File:", "").rsplit(".", 1)[0]
+            out.append((url, title))
+            if len(out) >= limit: break
+        return out
+    except Exception:
+        return []
+
 # ── Gemini 2.5 Flash helpers ──────────────────────────────────────────────────
 def analyze_image_gemini(image_bytes):
     """Analisa imagem com Gemini 2.5 Flash. Retorna (texto, erro)."""
@@ -438,7 +506,10 @@ def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
             yt_note = "🎥 Li a transcrição do vídeo do YouTube e estou analisando..."
         else:
             yt_note = f"⚠️ Não consegui ler a transcrição do vídeo (pode não ter legendas disponíveis). Detalhe: {err}"
-    api = [{"role":"system","content": SYSTEM_PROMPT + rag}]
+    # Contexto da Área de Expertise ativa (se houver)
+    area = st.session_state.get("active_area")
+    area_ctx = f"\n\n**CONTEXTO DA ÁREA SELECIONADA ({area}):** {AREA_CONTEXT[area]}\n" if area in AREA_CONTEXT else ""
+    api = [{"role":"system","content": SYSTEM_PROMPT + area_ctx + IMG_INSTRUCTION + rag}]
     for m in st.session_state.messages[:-1]:
         if m["role"] in ("user","assistant"): api.append({"role":m["role"],"content":m["content"]})
     if image_bytes:
@@ -454,14 +525,31 @@ def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
     with st.chat_message("assistant", avatar=TECH_AVATAR):
         if rag: st.caption("📚 Consultando base de conhecimento...")
         if yt_note: st.caption(yt_note)
-        ph = st.empty(); full = ""
+        ph = st.empty(); full = ""; clean = ""
         try:
             for chunk in stream_groq(api, GROQ_API_KEY, model):
-                full += chunk; ph.markdown(full+"▌")
-            ph.markdown(full)
+                full += chunk
+                ph.markdown(full.split("IMG_SEARCH")[0] + "▌")
+            clean = re.sub(r'[\s\*]*IMG_SEARCH.*$', '', full, flags=re.DOTALL).strip()
+            ph.markdown(clean)
         except requests.HTTPError as e:
-            ph.error(f"Erro {e.response.status_code}: {e.response.text[:200]}"); full = ""
-    return full
+            ph.error(f"Erro {e.response.status_code}: {e.response.text[:200]}")
+            return "", []
+        # Imagens ilustrativas reais (Wikimedia Commons) — máx. 2, nunca inventadas
+        images = []
+        mt = re.search(r'IMG_SEARCH:\s*([^\n]*)', full)
+        if mt:
+            line = mt.group(1).strip()
+            if line and line.lower() != "none":
+                terms = [t.strip() for t in line.split("|") if t.strip()][:2]
+                for t in terms:
+                    images.extend(search_images(t, 1))
+                    if len(images) >= 2: break
+                images = images[:2]
+        for url, cap in images:
+            try: st.image(url, caption=cap, use_container_width=True)
+            except Exception: pass
+    return clean, images
 
 # ══════════════════════════════════════════════════════════════════════════════
 st.set_page_config(page_title="Técnico Especialista em Manutenção", page_icon="🔧", layout="centered", initial_sidebar_state="expanded")
@@ -476,6 +564,7 @@ kb_count = count_docs(sb) if sb else 0
 if "messages"     not in st.session_state: st.session_state.messages     = []
 if "quick_prompt" not in st.session_state: st.session_state.quick_prompt = ""
 if "sidebar_open" not in st.session_state: st.session_state.sidebar_open = True
+if "active_area"  not in st.session_state: st.session_state.active_area  = None
 
 # Oculta a barra lateral quando fechada
 if not st.session_state.sidebar_open:
@@ -512,12 +601,31 @@ with st.sidebar:
         ("🤖","Automação / CLP"),
         ("🌐","Redes Industriais"),
     ]
-    st.markdown(
-        '<div class="exp-grid">'
-        + "".join(f'<div class="exp-item"><span class="ei">{icon}</span>{label}</div>' for icon, label in exp_items)
-        + '</div>',
-        unsafe_allow_html=True,
-    )
+    exp_labels = [l for _, l in exp_items]
+    active_area = st.session_state.get("active_area")
+    # Destaca em verde o botão da área ativa
+    if active_area in exp_labels:
+        st.markdown(
+            f'<style>.st-key-exp_{exp_labels.index(active_area)} button {{ border: 1.5px solid #2ECC71 !important; }}</style>',
+            unsafe_allow_html=True,
+        )
+    # Grade de 2 colunas com botões clicáveis
+    for r in range(0, len(exp_items), 2):
+        cols = st.columns(2)
+        for j, (icon, label) in enumerate(exp_items[r:r+2]):
+            with cols[j]:
+                if st.button(f"{icon} {label}", key=f"exp_{r+j}", use_container_width=True):
+                    st.session_state.active_area = label
+                    st.session_state.quick_prompt = (
+                        f"Estou com uma dúvida em {label}. Me faça as perguntas necessárias "
+                        f"para te ajudar a me dar a melhor solução possível."
+                    )
+                    st.rerun()
+    if active_area:
+        st.markdown(
+            f'<div style="font-size:.72rem; color:#2ECC71; margin:6px 0 2px 2px;">🎯 Área ativa: {active_area}</div>',
+            unsafe_allow_html=True,
+        )
 
     st.markdown('<div style="margin-top:16px;"></div>', unsafe_allow_html=True)
 
@@ -537,7 +645,8 @@ with st.sidebar:
 
     if st.button("🗑️ Nova Conversa", use_container_width=True, key="btn_nova"):
         st.session_state.messages = []
-        st.session_state.quick_prompt = ""; st.rerun()
+        st.session_state.quick_prompt = ""
+        st.session_state.active_area = None; st.rerun()
 
     st.markdown(f"""
     <div class="status-pill">
@@ -691,6 +800,10 @@ with st.container():
             st.markdown(msg["content"])
             if msg.get("image_bytes"):
                 st.image(PIL.Image.open(io.BytesIO(msg["image_bytes"])), width=300)
+            if msg.get("images"):
+                for _u, _c in msg["images"]:
+                    try: st.image(_u, caption=_c, use_container_width=True)
+                    except Exception: pass
 
     # Ação rápida (botões + voz)
     if st.session_state.quick_prompt:
@@ -698,8 +811,11 @@ with st.container():
         st.session_state.quick_prompt = ""
         with st.chat_message("user", avatar=USER_AVATAR): st.markdown(qp)
         st.session_state.messages.append({"role":"user","content":qp})
-        full = do_chat(qp, None, None, sb, kb_count)
-        if full: st.session_state.messages.append({"role":"assistant","content":full})
+        full, imgs = do_chat(qp, None, None, sb, kb_count)
+        if full:
+            am = {"role":"assistant","content":full}
+            if imgs: am["images"] = imgs
+            st.session_state.messages.append(am)
 
 # ── Microfone + Chat input lado a lado ──────────────────────────────────────────
 voice_col, chat_col = st.columns([2, 9])
@@ -744,5 +860,8 @@ if chat:
             with st.chat_message("user", avatar=USER_AVATAR):
                 st.markdown(display)
                 if img_b: st.image(PIL.Image.open(io.BytesIO(img_b)), width=300)
-            full = do_chat(prompt, img_b, mime, sb, kb_count)
-            if full: st.session_state.messages.append({"role": "assistant", "content": full})
+            full, imgs = do_chat(prompt, img_b, mime, sb, kb_count)
+            if full:
+                am = {"role": "assistant", "content": full}
+                if imgs: am["images"] = imgs
+                st.session_state.messages.append(am)
