@@ -4,3 +4,4 @@ Pillow
 supabase
 pypdf
 youtube-transcript-api==0.6.2
+google-generativeai
