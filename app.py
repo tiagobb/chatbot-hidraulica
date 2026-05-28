@@ -133,17 +133,16 @@ section[data-testid="stSidebar"] {
     font-size: .9rem !important; font-weight: 600 !important; padding: 8px 18px !important;
 }
 
-/* Lista de expertise */
+/* Lista de expertise — compacta: os 7 itens cabem sem rolar, texto em 1 linha */
 .exp-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 11px 13px; border-radius: 9px; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 7px; border-radius: 8px; margin-bottom: 4px;
     background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06);
-    font-size: .96rem; color: #D4DBEA;
+    font-size: .62rem; color: #D4DBEA; white-space: nowrap;
 }
-.exp-item .ei { font-size: 1.18rem; min-width: 22px; text-align: center; }
-/* Grade responsiva: 2 colunas no celular, 3 no desktop */
-.exp-grid { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 6px; }
-@media (min-width: 768px) { .exp-grid { grid-template-columns: repeat(3, 1fr); } }
+.exp-item .ei { font-size: .92rem; min-width: 14px; text-align: center; }
+/* Grade de 2 colunas */
+.exp-grid { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 5px; }
 
 /* Status */
 .status-pill {
