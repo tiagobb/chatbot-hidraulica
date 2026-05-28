@@ -59,7 +59,17 @@ span[class*="material"] {
 
 #MainMenu, footer, .stDeployButton { display: none !important; }
 [data-testid="stToolbar"] { display: none !important; }
-[data-testid="manage-app-button"], ._link_gzau3_10, .stAppDeployButton { display: none !important; }
+/* Esconde o botão flutuante "Manage app" do Streamlit Cloud (canto inferior direito) */
+[data-testid="manage-app-button"],
+[class*="_profileContainer_"],
+[class*="_viewerBadge_"],
+[class*="_link_gzau3"],
+[class*="_container_gzau3"],
+[class*="_profilePreview_"],
+.stAppDeployButton,
+.viewerBadge_container__r5tak,
+.viewerBadge_link__qRIco,
+.styles_terminalButton__JBj5T { display: none !important; }
 header[data-testid="stHeader"] { background: transparent !important; }
 .stApp, .main { background: #12151C !important; }
 .block-container { padding: 1.5rem 2rem 7rem 2rem !important; max-width: 1180px !important; }
