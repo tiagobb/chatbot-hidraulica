@@ -56,7 +56,14 @@ IMG_INSTRUCTION = ("\n\nINSTRUÇÃO DE IMAGEM: Ao FINAL da resposta, em uma últ
     "(sem markdown), escreva 'IMG_SEARCH:' seguido de 1 ou 2 termos curtos EM INGLÊS separados por '|' "
     "para localizar imagens técnicas REAIS que ilustrem os componentes/esquemas citados "
     "(ex: 'IMG_SEARCH: hydraulic directional valve | ISO 1219 symbol'). "
-    "Se não fizer sentido ilustrar, escreva 'IMG_SEARCH: none'. NUNCA escreva URLs.")
+    "Se não fizer sentido ilustrar, escreva 'IMG_SEARCH: none'. NUNCA escreva URLs."
+    "\n\nINSTRUÇÃO DE VÍDEOS: ANTES da linha IMG_SEARCH (que deve continuar sendo a ÚLTIMA de todas), "
+    "inclua uma seção de vídeos recomendados do YouTube no formato EXATO:\n"
+    "🎥 Vídeos recomendados:\n"
+    "• [Título descritivo do vídeo] → https://www.youtube.com/results?search_query=termos+técnicos\n"
+    "• [Título descritivo do vídeo] → https://www.youtube.com/results?search_query=termos+técnicos\n"
+    "Inclua de 2 a 3 sugestões, com termos de busca EM PORTUGUÊS específicos ao problema respondido "
+    "(substitua os espaços por '+' na URL).")
 
 CSS = """
 <style>
@@ -537,6 +544,7 @@ def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
             return "", []
         # Imagens ilustrativas reais (Wikimedia Commons) — máx. 2, nunca inventadas
         images = []
+        terms = []
         mt = re.search(r'IMG_SEARCH:\s*([^\n]*)', full)
         if mt:
             line = mt.group(1).strip()
@@ -546,9 +554,13 @@ def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
                     images.extend(search_images(t, 1))
                     if len(images) >= 2: break
                 images = images[:2]
-        for url, cap in images:
-            try: st.image(url, caption=cap, use_container_width=True)
-            except Exception: pass
+        if images:
+            for url, cap in images:
+                try: st.image(url, caption=cap, use_container_width=True)
+                except Exception: pass
+        elif terms:
+            st.markdown("🔍 **Buscar imagem:** [Clique aqui para buscar no Google Imagens]"
+                f"(https://www.google.com/search?tbm=isch&q={'+'.join(terms[0].split())})")
     return clean, images
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -615,11 +627,15 @@ with st.sidebar:
         for j, (icon, label) in enumerate(exp_items[r:r+2]):
             with cols[j]:
                 if st.button(f"{icon} {label}", key=f"exp_{r+j}", use_container_width=True):
-                    st.session_state.active_area = label
-                    st.session_state.quick_prompt = (
-                        f"Estou com uma dúvida em {label}. Me faça as perguntas necessárias "
-                        f"para te ajudar a me dar a melhor solução possível."
-                    )
+                    if st.session_state.active_area == label:
+                        st.session_state.active_area = None
+                        st.session_state.quick_prompt = ""
+                    else:
+                        st.session_state.active_area = label
+                        st.session_state.quick_prompt = (
+                            f"Estou com uma dúvida em {label}. Me faça as perguntas necessárias "
+                            f"para te ajudar a me dar a melhor solução possível."
+                        )
                     st.rerun()
     if active_area:
         st.markdown(
