@@ -556,7 +556,7 @@ def do_chat(prompt, image_bytes, mime_type, sb, kb_count):
                 images = images[:2]
         if images:
             for url, cap in images:
-                try: st.image(url, caption=cap, use_container_width=True)
+                try: st.image(url, caption=cap, width=300)
                 except Exception: pass
         elif terms:
             st.markdown("🔍 **Buscar imagem:** [Clique aqui para buscar no Google Imagens]"
@@ -629,13 +629,8 @@ with st.sidebar:
                 if st.button(f"{icon} {label}", key=f"exp_{r+j}", use_container_width=True):
                     if st.session_state.active_area == label:
                         st.session_state.active_area = None
-                        st.session_state.quick_prompt = ""
                     else:
                         st.session_state.active_area = label
-                        st.session_state.quick_prompt = (
-                            f"Estou com uma dúvida em {label}. Me faça as perguntas necessárias "
-                            f"para te ajudar a me dar a melhor solução possível."
-                        )
                     st.rerun()
     if active_area:
         st.markdown(
@@ -818,7 +813,7 @@ with st.container():
                 st.image(PIL.Image.open(io.BytesIO(msg["image_bytes"])), width=300)
             if msg.get("images"):
                 for _u, _c in msg["images"]:
-                    try: st.image(_u, caption=_c, use_container_width=True)
+                    try: st.image(_u, caption=_c, width=300)
                     except Exception: pass
 
     # Ação rápida (botões + voz)
