@@ -850,8 +850,7 @@ with voice_col:
     audio = st.audio_input("🎤", label_visibility="collapsed", key="voice_in")
 with chat_col:
     chat = st.chat_input("Digite sua pergunta, anexe uma foto ou cole um link do YouTube...",
-                         accept_file=True, file_type=["jpg", "jpeg", "png", "webp"],
-                         max_files=10)
+                         accept_file="multiple", file_type=["jpg", "jpeg", "png", "webp"])
 
 # Processa áudio (voz → transcrição → quick_prompt)
 if audio is not None:
