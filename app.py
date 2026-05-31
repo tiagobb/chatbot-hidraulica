@@ -946,18 +946,3 @@ if chat:
                             st.divider()
                 combined = "\n\n---\n\n".join(f"**📷 Imagem {i+1} ({all_images[i][2]}):**\n{r}" for i, r in enumerate(all_responses))
                 st.session_state.messages.append({"role":"assistant","content":combined})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
