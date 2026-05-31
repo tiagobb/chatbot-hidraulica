@@ -850,7 +850,8 @@ with voice_col:
     audio = st.audio_input("🎤", label_visibility="collapsed", key="voice_in")
 with chat_col:
     chat = st.chat_input("Digite sua pergunta, anexe uma foto ou cole um link do YouTube...",
-                         accept_file=True, file_type=["jpg", "jpeg", "png", "webp"])
+                         accept_file=True, file_type=["jpg", "jpeg", "png", "webp"],
+                         max_files=10)
 
 # Processa áudio (voz → transcrição → quick_prompt)
 if audio is not None:
@@ -866,29 +867,97 @@ if audio is not None:
         else:
             st.error(f"Não entendi o áudio: {verr}")
 
-# Processa texto/imagem do chat input
+# Processa texto/imagem(ns) do chat input
 if chat:
     prompt = (chat.text or "").strip()
     files  = chat.files or []
-    uf = files[0] if files else st.session_state.get("foto_up")
-    img_b, mime, sfx = None, None, ""
-    if uf:
-        img_b = uf.read(); mime = uf.type; sfx = f"\n\n📷 *[{uf.name}]*"
-    if not prompt and img_b:
-        prompt = "Analise esta imagem do equipamento/componente e me diga o que você identifica."
+    # Se não veio arquivo no chat, usa o da sidebar
+    if not files and st.session_state.get("foto_up"):
+        files = [st.session_state.get("foto_up")]
 
-    if prompt or img_b:
+    # Coleta todas as imagens anexadas (até 10)
+    all_images = []  # lista de (bytes, mime, nome)
+    for f in files[:10]:
+        fbytes = f.read()
+        if fbytes:
+            all_images.append((fbytes, f.type, f.name))
+
+    if not prompt and all_images:
+        if len(all_images) == 1:
+            prompt = "Analise esta imagem do equipamento/componente e me diga o que você identifica."
+        else:
+            prompt = f"Analise estas {len(all_images)} imagens do equipamento/componente e me diga o que você identifica em cada uma."
+
+    sfx = ""
+    if all_images:
+        sfx = "\n\n" + " ".join(f"📷 *[{name}]*" for _, _, name in all_images)
+
+    if prompt or all_images:
         display = prompt + sfx
         umsg = {"role": "user", "content": display}
-        if img_b: umsg["image_bytes"] = img_b
+        if all_images:
+            umsg["image_bytes"] = all_images[0][0]  # primeira imagem para histórico
+            umsg["all_images_count"] = len(all_images)
         st.session_state.messages.append(umsg)
 
         with st.container():
             with st.chat_message("user", avatar=USER_AVATAR):
                 st.markdown(display)
-                if img_b: st.image(PIL.Image.open(io.BytesIO(img_b)), width=300)
-            full, imgs = do_chat(prompt, img_b, mime, sb, kb_count)
-            if full:
-                am = {"role": "assistant", "content": full}
-                if imgs: am["images"] = imgs
-                st.session_state.messages.append(am)
+                for img_b, _, _ in all_images:
+                    st.image(PIL.Image.open(io.BytesIO(img_b)), width=300)
+
+            # Envia a primeira imagem para a API (Groq Vision aceita 1 imagem por vez)
+            # Para múltiplas: analisa cada uma sequencialmente
+            if len(all_images) <= 1:
+                img_b = all_images[0][0] if all_images else None
+                mime = all_images[0][1] if all_images else None
+                full, imgs = do_chat(prompt, img_b, mime, sb, kb_count)
+                if full:
+                    am = {"role": "assistant", "content": full}
+                    if imgs: am["images"] = imgs
+                    st.session_state.messages.append(am)
+            else:
+                # Múltiplas imagens: envia cada uma com contexto
+                all_responses = []
+                with st.chat_message("assistant", avatar=TECH_AVATAR):
+                    for idx, (img_b, mime, name) in enumerate(all_images):
+                        st.markdown(f"**📷 Imagem {idx+1}/{len(all_images)}: {name}**")
+                        # Monta prompt individual
+                        ind_prompt = f"{prompt}\n\n(Analisando imagem {idx+1} de {len(all_images)}: {name})"
+                        # Contexto da área ativa
+                        area = st.session_state.get("active_area")
+                        area_ctx = f"\n\n**CONTEXTO DA ÁREA SELECIONADA ({area}):** {AREA_CONTEXT[area]}\n" if area in AREA_CONTEXT else ""
+                        api = [{"role":"system","content": SYSTEM_PROMPT + area_ctx}]
+                        b64 = base64.b64encode(img_b).decode()
+                        api.append({"role":"user","content":[
+                            {"type":"text","text":ind_prompt},
+                            {"type":"image_url","image_url":{"url":f"data:{mime};base64,{b64}"}},
+                        ]})
+                        ph = st.empty(); full_resp = ""
+                        try:
+                            for chunk in stream_groq(api, GROQ_API_KEY, VISION_MODEL):
+                                full_resp += chunk
+                                ph.markdown(full_resp + "▌")
+                            ph.markdown(full_resp)
+                            all_responses.append(full_resp)
+                        except requests.HTTPError as e:
+                            ph.error(f"Erro na imagem {idx+1}: {e.response.status_code}")
+                        if idx < len(all_images) - 1:
+                            st.divider()
+                combined = "\n\n---\n\n".join(f"**📷 Imagem {i+1} ({all_images[i][2]}):**\n{r}" for i, r in enumerate(all_responses))
+                st.session_state.messages.append({"role":"assistant","content":combined})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
