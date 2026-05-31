@@ -68,18 +68,17 @@ AREA_CONTEXT = {
 }
 
 # Instrução para o modelo sugerir termos de busca de imagem (URLs reais buscadas no Wikimedia, nunca inventadas)
-IMG_INSTRUCTION = ("\n\nINSTRUÇÃO DE IMAGEM: Ao FINAL da resposta, em uma última linha separada e em texto puro "
-    "(sem markdown), escreva 'IMG_SEARCH:' seguido de 1 ou 2 termos curtos EM INGLÊS separados por '|' "
-    "para localizar imagens técnicas REAIS que ilustrem os componentes/esquemas citados "
+IMG_INSTRUCTION = ("\n\nINSTRUÇÃO DE IMAGEM: SOMENTE quando a resposta envolver um componente físico específico, "
+    "esquema técnico, diagrama ou peça que seria útil visualizar, escreva na ÚLTIMA linha (texto puro, sem markdown): "
+    "'IMG_SEARCH:' seguido de 1 ou 2 termos curtos EM INGLÊS separados por '|' "
     "(ex: 'IMG_SEARCH: hydraulic directional valve | ISO 1219 symbol'). "
-    "Se não fizer sentido ilustrar, escreva 'IMG_SEARCH: none'. NUNCA escreva URLs."
-    "\n\nINSTRUÇÃO DE VÍDEOS: ANTES da linha IMG_SEARCH (que deve continuar sendo a ÚLTIMA de todas), "
-    "inclua uma seção de vídeos recomendados do YouTube no formato EXATO:\n"
+    "Para perguntas conceituais, saudações, explicações teóricas ou respostas simples, "
+    "NÃO inclua IMG_SEARCH (simplesmente omita a linha). NUNCA escreva URLs de imagem."
+    "\n\nINSTRUÇÃO DE VÍDEOS: SOMENTE quando o tema for complexo e um vídeo tutorial ajudaria, "
+    "inclua ANTES da linha IMG_SEARCH (se houver) uma seção no formato:\n"
     "🎥 Vídeos recomendados:\n"
     "• [Título descritivo do vídeo] → https://www.youtube.com/results?search_query=termos+técnicos\n"
-    "• [Título descritivo do vídeo] → https://www.youtube.com/results?search_query=termos+técnicos\n"
-    "Inclua de 2 a 3 sugestões, com termos de busca EM PORTUGUÊS específicos ao problema respondido "
-    "(substitua os espaços por '+' na URL).")
+    "Para perguntas simples, saudações ou respostas curtas, NÃO inclua vídeos.")
 
 CSS = """
 <style>
